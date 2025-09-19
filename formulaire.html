@@ -5,96 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription au Jeu</title>
     <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-            font-family: "Avenir Book", "Avenir", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            background-color: #f5f5f7;
-            color: #1d1d1f;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .form-container {
-            background-color: #ffffff;
-            border: 1px solid #d2d2d7;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-            padding: 40px 50px;
-            border-radius: 18px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .form-container h1 {
-            font-size: 28px;
-            font-weight: 900;
-            text-transform: uppercase;
-            margin-top: 0;
-            margin-bottom: 35px;
-            letter-spacing: 1px;
-        }
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: normal;
-            color: #86868b;
-            font-size: 14px;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 12px 15px;
-            background-color: #f5f5f7;
-            border: 1px solid #d2d2d7;
-            border-radius: 10px;
-            color: #1d1d1f;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            font-family: inherit;
-        }
-        .input-group input:focus {
-            outline: none;
-            border-color: #007aff;
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
-        }
-        .submit-button {
-            width: 100%;
-            padding: 14px;
-            font-size: 17px;
-            font-weight: 600;
-            color: #ffffff;
-            background-color: #000000;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
-            margin-top: 15px;
-        }
-        .submit-button:hover {
-            background-color: #333333;
-        }
-        .submit-button:disabled {
-            background-color: #d2d2d7;
-            cursor: not-allowed;
-        }
-        .message {
-            margin-top: 20px;
-            font-weight: normal;
-            font-size: 14px;
-            min-height: 20px;
-        }
-        .message.success {
-            color: #2e7d32;
-        }
-        .message.error {
-            color: #d32f2f;
-        }
+        body{margin:0;padding:20px;box-sizing:border-box;font-family:"Avenir Book","Avenir",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";background-color:#f5f5f7;color:#1d1d1f;display:flex;justify-content:center;align-items:center;min-height:100vh}.form-container{background-color:#fff;border:1px solid #d2d2d7;box-shadow:0 8px 32px rgba(0,0,0,.08);padding:40px 50px;border-radius:18px;width:100%;max-width:400px;text-align:center}.form-container h1{font-size:28px;font-weight:900;text-transform:uppercase;margin-top:0;margin-bottom:35px;letter-spacing:1px}.input-group{margin-bottom:20px;text-align:left}.input-group label{display:block;margin-bottom:8px;font-weight:400;color:#86868b;font-size:14px}.input-group input{width:100%;padding:12px 15px;background-color:#f5f5f7;border:1px solid #d2d2d7;border-radius:10px;color:#1d1d1f;font-size:16px;box-sizing:border-box;transition:border-color .2s ease,box-shadow .2s ease;font-family:inherit}.input-group input:focus{outline:0;border-color:#007aff;box-shadow:0 0 0 3px rgba(0,122,255,.2)}.submit-button{width:100%;padding:14px;font-size:17px;font-weight:600;color:#fff;background-color:#000;border:none;border-radius:10px;cursor:pointer;transition:background-color .2s ease-in-out;margin-top:15px}.submit-button:hover{background-color:#333}.submit-button:disabled{background-color:#d2d2d7;cursor:not-allowed}.message{margin-top:20px;font-weight:400;font-size:14px;min-height:20px}.message.success{color:#2e7d32}.message.error{color:#d32f2f}
     </style>
 </head>
 <body>
@@ -118,11 +29,9 @@
         <div id="message-area" class="message"></div>
     </div>
 
-    <!-- ===== BLOC FIREBASE (À NE PAS MODIFIER) ===== -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
       import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
       const firebaseConfig = {
         apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
         authDomain: "roue-de-la-chance-c0f6a.firebaseapp.com",
@@ -131,14 +40,10 @@
         messagingSenderId: "491916732335",
         appId: "1:491916732335:web:7a9765b2720d995583315a"
       };
-
       const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-
-      window.db = db;
+      window.db = getFirestore(app);
       window.firestoreFunctions = { collection, addDoc, getDocs, query, where };
     </script>
-    <!-- ============================================= -->
 
     <script>
         const form = document.getElementById('inscription-form');
@@ -148,20 +53,19 @@
         const messageArea = document.getElementById('message-area');
         const submitButton = document.querySelector('.submit-button');
 
-        // On vérifie dès le chargement de la page si un ID de session est présent
         const urlParams = new URLSearchParams(window.location.search);
         const sessionId = urlParams.get('session');
+
+        console.log("URL Actuelle:", window.location.href);
+        console.log("Session ID Trouvé:", sessionId);
+
         if (!sessionId) {
             document.querySelector('.form-container').innerHTML = '<h1>Lien d\'invitation invalide</h1><p>Aucun ID de session n\'a été trouvé dans l\'URL.</p>';
         }
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
-            
-            // On récupère les fonctions et la base de données depuis la fenêtre globale
-            const db = window.db;
-            const { collection, addDoc, getDocs, query, where } = window.firestoreFunctions;
-
+            const { db, firestoreFunctions } = window;
             const fullname = fullnameInput.value.trim();
             const pseudo = pseudoInput.value.trim();
             const whatsapp = whatsappInput.value.trim();
@@ -178,33 +82,25 @@
             submitButton.disabled = true;
 
             try {
-                // On crée une référence à la sous-collection "participants" de notre session
-                const participantsRef = collection(db, "sessions", sessionId, "participants");
-
-                // On vérifie si le pseudo existe déjà (insensible à la casse)
-                const q = query(participantsRef, where("pseudo_lower", "==", pseudo.toLowerCase()));
-                const querySnapshot = await getDocs(q);
+                const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
+                const q = firestoreFunctions.query(participantsRef, firestoreFunctions.where("pseudo_lower", "==", pseudo.toLowerCase()));
+                const querySnapshot = await firestoreFunctions.getDocs(q);
 
                 if (!querySnapshot.empty) {
-                    // Le pseudo est déjà pris
                     displayMessage("Ce pseudo est déjà utilisé.", "error");
                     submitButton.textContent = "S'INSCRIRE";
                     submitButton.disabled = false;
                 } else {
-                    // Le pseudo est libre, on ajoute le nouveau participant
-                    await addDoc(participantsRef, {
+                    await firestoreFunctions.addDoc(participantsRef, {
                         fullname: fullname,
                         pseudo: pseudo,
                         whatsapp: whatsapp,
                         pseudo_lower: pseudo.toLowerCase(),
-                        createdAt: new Date() // On ajoute une date d'inscription
+                        createdAt: new Date()
                     });
-
                     displayMessage("Inscription réussie !", "success");
                     submitButton.textContent = 'INSCRIT !';
-                    // On laisse le bouton désactivé pour éviter les double-inscriptions
                 }
-
             } catch (error) {
                 console.error("Erreur avec Firestore: ", error);
                 displayMessage("Une erreur est survenue. Veuillez réessayer.", "error");
@@ -222,4 +118,3 @@
     </script>
 </body>
 </html>
-
