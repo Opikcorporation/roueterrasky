@@ -121,7 +121,6 @@
     <!-- ===== BLOC FIREBASE (À NE PAS MODIFIER) ===== -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      // On importe les fonctions de Firestore
       import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
       const firebaseConfig = {
@@ -133,51 +132,85 @@
         appId: "1:491916732335:web:7a9765b2720d995583315a"
       };
 
-      // Initialisation de Firebase et Firestore
       const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app); // On récupère l'accès à la base de données
+      const db = getFirestore(app);
 
-      // On rend 'db' accessible globalement pour le script suivant
       window.db = db;
       window.firestoreFunctions = { collection, addDoc, getDocs, query, where };
     </script>
     <!-- ============================================= -->
 
     <script>
-        // Le script de la page reste ici
         const form = document.getElementById('inscription-form');
+        const fullnameInput = document.getElementById('fullname');
         const pseudoInput = document.getElementById('pseudo');
+        const whatsappInput = document.getElementById('whatsapp');
         const messageArea = document.getElementById('message-area');
         const submitButton = document.querySelector('.submit-button');
 
-        // La simulation sera remplacée par un vrai appel à Firebase
-        const pseudosDejaPris = ['admin', 'test', 'gagnant', 'joueur1'];
+        // On vérifie dès le chargement de la page si un ID de session est présent
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+        if (!sessionId) {
+            document.querySelector('.form-container').innerHTML = '<h1>Lien d\'invitation invalide</h1><p>Aucun ID de session n\'a été trouvé dans l\'URL.</p>';
+        }
 
-        form.addEventListener('submit', function(event) {
+        form.addEventListener('submit', async function(event) {
             event.preventDefault();
-            const pseudo = pseudoInput.value.trim().toLowerCase();
+            
+            // On récupère les fonctions et la base de données depuis la fenêtre globale
+            const db = window.db;
+            const { collection, addDoc, getDocs, query, where } = window.firestoreFunctions;
+
+            const fullname = fullnameInput.value.trim();
+            const pseudo = pseudoInput.value.trim();
+            const whatsapp = whatsappInput.value.trim();
             
             messageArea.textContent = '';
             messageArea.className = 'message';
             
-            if (!pseudo) {
-                displayMessage("Le pseudo ne peut pas être vide.", "error");
+            if (!fullname || !pseudo || !whatsapp) {
+                displayMessage("Veuillez remplir tous les champs.", "error");
                 return;
             }
 
             submitButton.textContent = 'VÉRIFICATION...';
             submitButton.disabled = true;
 
-            setTimeout(() => {
-                if (pseudosDejaPris.includes(pseudo)) {
+            try {
+                // On crée une référence à la sous-collection "participants" de notre session
+                const participantsRef = collection(db, "sessions", sessionId, "participants");
+
+                // On vérifie si le pseudo existe déjà (insensible à la casse)
+                const q = query(participantsRef, where("pseudo_lower", "==", pseudo.toLowerCase()));
+                const querySnapshot = await getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    // Le pseudo est déjà pris
                     displayMessage("Ce pseudo est déjà utilisé.", "error");
                     submitButton.textContent = "S'INSCRIRE";
                     submitButton.disabled = false;
                 } else {
+                    // Le pseudo est libre, on ajoute le nouveau participant
+                    await addDoc(participantsRef, {
+                        fullname: fullname,
+                        pseudo: pseudo,
+                        whatsapp: whatsapp,
+                        pseudo_lower: pseudo.toLowerCase(),
+                        createdAt: new Date() // On ajoute une date d'inscription
+                    });
+
                     displayMessage("Inscription réussie !", "success");
                     submitButton.textContent = 'INSCRIT !';
+                    // On laisse le bouton désactivé pour éviter les double-inscriptions
                 }
-            }, 1000);
+
+            } catch (error) {
+                console.error("Erreur avec Firestore: ", error);
+                displayMessage("Une erreur est survenue. Veuillez réessayer.", "error");
+                submitButton.textContent = "S'INSCRIRE";
+                submitButton.disabled = false;
+            }
         });
 
         function displayMessage(text, type) {
@@ -189,3 +222,4 @@
     </script>
 </body>
 </html>
+
