@@ -288,4 +288,21 @@
         function announceWinner(winnerName) {
             console.log("Le gagnant est :", winnerName);
 
-            //
+            // Jouer les confettis
+            confettiAnimation.goToAndPlay(0);
+            document.getElementById('confetti-animation').style.display = 'block';
+
+            // Réactiver le bouton après un délai pour permettre de relancer
+            setTimeout(() => {
+                document.getElementById('confetti-animation').style.display = 'none';
+                spinButton.disabled = false;
+                alert(`Félicitations à ${winnerName} !`);
+            }, 4000); // 4 secondes
+        }
+
+        // --- Initialisation ---
+        createWheel();
+
+    </script>
+</body>
+</html>
