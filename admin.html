@@ -183,7 +183,6 @@
     <!-- ===== BLOC FIREBASE (À NE PAS MODIFIER) ===== -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      // On importe les fonctions de Firestore
       import { getFirestore, collection, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
       const firebaseConfig = {
@@ -218,20 +217,53 @@
             document.querySelector('#winner-slot-3 .name')
         ];
         
-        let participants = [];
+        let participants = []; // Gardera la liste des participants en mémoire
         let winnerSlots = [null, null, null, null];
+        let currentSessionId = null;
 
         createSessionBtn.addEventListener('click', () => {
-            const sessionId = `session-${Date.now().toString(36)}`;
+            currentSessionId = `session-${Date.now().toString(36)}`;
             const baseUrl = 'https://opikorporation.github.io/touteterrasky/';
             
-            inscriptionLinkInput.value = `${baseUrl}formulaire.html?session=${sessionId}`;
-            wheelLinkInput.value = `${baseUrl}?session=${sessionId}`;
+            inscriptionLinkInput.value = `${baseUrl}formulaire.html?session=${currentSessionId}`;
+            wheelLinkInput.value = `${baseUrl}?session=${currentSessionId}`;
             
             sessionLinksDiv.style.display = 'block';
             createSessionBtn.disabled = true;
             createSessionBtn.textContent = 'Session Créée !';
+
+            // Démarrer l'écoute des participants pour cette session
+            listenForParticipants(currentSessionId);
         });
+
+        // --- NOUVEAU : Écoute en temps réel des participants ---
+        function listenForParticipants(sessionId) {
+            const { db, firestoreFunctions } = window;
+            const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
+
+            firestoreFunctions.onSnapshot(participantsRef, (snapshot) => {
+                participantList.innerHTML = ''; // Vide la liste pour la reconstruire
+                participants = []; // Vide le tableau local
+
+                snapshot.docs.forEach(doc => {
+                    const participantData = doc.data();
+                    participants.push(participantData); // Ajoute au tableau local
+                    
+                    const li = document.createElement('li');
+                    li.textContent = participantData.pseudo;
+                    li.dataset.pseudo = participantData.pseudo;
+                    
+                    // Si le participant est un gagnant sélectionné, on garde le style
+                    if (winnerSlots.includes(participantData.pseudo)) {
+                        li.classList.add('selected');
+                    }
+
+                    participantList.appendChild(li);
+                });
+
+                participantCountSpan.textContent = participants.length;
+            });
+        }
 
         copyBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -242,15 +274,6 @@
                 setTimeout(() => { btn.textContent = 'Copier'; }, 2000);
             });
         });
-
-        function addParticipant(participant) {
-            participants.push(participant);
-            const li = document.createElement('li');
-            li.textContent = participant.pseudo;
-            li.dataset.pseudo = participant.pseudo;
-            participantList.appendChild(li);
-            participantCountSpan.textContent = participants.length;
-        }
 
         participantList.addEventListener('click', (event) => {
             if (event.target && event.target.tagName === 'LI') {
@@ -270,6 +293,7 @@
                     }
                 }
                 updateWinnerSlotsUI();
+                saveWinnersToFirebase(); // On sauvegarde les gagnants à chaque changement
             }
         });
         
@@ -287,21 +311,19 @@
             });
         }
 
-        // La simulation sera remplacée par un vrai appel à Firebase
-        const sampleParticipants = [
-            { pseudo: 'SuperJoueur92' }, { pseudo: 'Lina_DXB' }, { pseudo: 'MarcDubai' }, 
-            { pseudo: 'TheWinner' }, { pseudo: 'LuckyStar' }, { pseudo: 'JojoLePro' }, 
-            { pseudo: 'Yasmina' }, { pseudo: 'Karim_Spin' }
-        ];
-        let participantIndex = 0;
-        const intervalId = setInterval(() => {
-            if (participantIndex < sampleParticipants.length) {
-                addParticipant(sampleParticipants[participantIndex]);
-                participantIndex++;
-            } else {
-                clearInterval(intervalId);
+        // --- NOUVEAU : Sauvegarde des gagnants dans Firebase ---
+        async function saveWinnersToFirebase() {
+            if (!currentSessionId) return;
+            const { db, firestoreFunctions } = window;
+            const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+            try {
+                await firestoreFunctions.setDoc(sessionDocRef, { winners: winnerSlots }, { merge: true });
+                console.log("Gagnants sauvegardés !");
+            } catch (error) {
+                console.error("Erreur de sauvegarde des gagnants :", error);
             }
-        }, 3000);
+        }
     </script>
 </body>
 </html>
+
