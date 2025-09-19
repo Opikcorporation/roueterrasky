@@ -14,29 +14,23 @@
 
         body {
             margin: 0;
-            padding: 10px 20px; /* Un peu moins de padding vertical */
+            padding: 10px 20px;
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
-            background-color: #1a023b; /* Couleur de base si l'animation met du temps à charger */
+            background-color: #1a023b;
             color: white;
-            
-            /* --- MISE EN PAGE FLEXBOX AMÉLIORÉE --- */
             display: flex;
             flex-direction: column;
-            justify-content: space-around; /* Distribue l'espace pour éviter que les éléments se collent en haut */
+            justify-content: center; /* On recentre verticalement */
             align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden; /* Empêche le scroll horizontal */
-            overflow-y: auto; /* AJOUT : Permet de scroller verticalement SI le contenu dépasse */
+            height: 100vh; /* Hauteur fixe, pas de min-height */
+            overflow: hidden; /* ON SUPPRIME LE SCROLL, tout doit tenir */
         }
 
-        /* --- RE-INTRODUCTION DE L'ANIMATION DE FOND --- */
         #bg-animation {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: -1;
         }
 
@@ -55,16 +49,20 @@
 
         .main-container {
             display: flex; flex-direction: column;
-            align-items: center; gap: 20px; width: 100%;
+            align-items: center; gap: 20px;
+            width: 100%;
         }
         
         .title-image {
-            width: var(--title-size); max-width: 90%; height: auto;
+            width: var(--title-size);
+            max-width: 90%;
+            height: auto;
+            transition: all 0.3s ease; /* Pour un déplacement fluide */
         }
 
         .wheel-container {
             position: relative; width: var(--wheel-size); height: var(--wheel-size);
-            max-width: 95vw; max-height: 95vh;
+            max-width: 95vw; max-height: 80vh; /* Limite la hauteur max de la roue */
             display: flex; justify-content: center; align-items: center;
         }
         
@@ -93,7 +91,8 @@
 
         .wheel svg { width: 100%; height: 100%; }
         .wheel .segment-text {
-            font-size: clamp(8px, 3vw, 16px); font-weight: 700;
+            font-size: clamp(8px, 3vw, 16px);
+            font-weight: 700;
             fill: #fff; text-anchor: middle;
         }
 
@@ -103,7 +102,7 @@
             border: none; border-radius: 50px; cursor: pointer;
             text-transform: uppercase; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             transition: all 0.2s ease-in-out; z-index: 10;
-            flex-shrink: 0; /* Empêche le bouton de rétrécir */
+            flex-shrink: 0;
         }
         #spin-button:hover { transform: scale(1.05); }
         #spin-button:disabled { cursor: not-allowed; background: #ccc; transform: scale(1); box-shadow: none; }
@@ -120,17 +119,18 @@
         }
 
         .winner-popup .winner-name {
-            font-size: clamp(40px, 12vw, 80px); font-weight: 800;
-            color: #FFD700; padding: 0 20px;
+            font-size: clamp(40px, 12vw, 80px);
+            font-weight: 800; color: #FFD700; padding: 0 20px;
             text-shadow: 0px 1px 0px #c8a900, 0px 2px 0px #c0a000, 0px 3px 0px #b89700, 0px 4px 0px #b08e00, 0px 5px 0px #a88500, 0px 6px 1px rgba(0,0,0,0.1), 0px 0px 5px rgba(0,0,0,0.1), 0px 1px 3px rgba(0,0,0,0.3), 0px 3px 5px rgba(0,0,0,0.2), 0px 5px 10px rgba(0,0,0,0.25), 0px 10px 10px rgba(0,0,0,0.2), 0px 20px 20px rgba(0,0,0,0.15);
         }
 
         .winner-popup .prize-text {
-            font-size: clamp(20px, 6vw, 40px); color: #fff;
-            margin-top: -10px; text-shadow: 0 0 10px #000, 0 0 20px #000;
+            font-size: clamp(20px, 6vw, 40px);
+            color: #fff; margin-top: -10px;
+            text-shadow: 0 0 10px #000, 0 0 20px #000;
         }
         
-        /* --- MEDIA QUERIES AJUSTÉES --- */
+        /* --- MEDIA QUERIES --- */
         @media (max-width: 768px) {
             :root {
                 --wheel-size: 400px;
@@ -139,12 +139,30 @@
             #spin-button { font-size: 20px; padding: 12px 35px; }
         }
         
-        @media (max-width: 500px), (max-height: 550px) and (orientation: landscape) {
-            :root {
-                --wheel-size: 260px; /* Encore un peu plus petit */
-                --title-size: 220px; /* Encore un peu plus petit */
+        /* --- NOUVEAU : Réorganisation pour les écrans à faible hauteur --- */
+        @media (max-height: 700px) and (orientation: landscape), (max-width: 400px) {
+            body {
+                justify-content: center; /* On recentre juste la roue et le bouton */
             }
-            .main-container { gap: 10px; } /* Espacement réduit */
+
+            .title-image {
+                position: absolute; /* On sort le logo du flux normal */
+                top: 15px;
+                left: 15px;
+                width: 180px; /* On le rend plus petit */
+                z-index: 20;
+            }
+
+            .main-container {
+                padding-top: 0; /* Plus besoin de marge en haut car le titre n'est plus là */
+                gap: 15px;
+            }
+
+            :root {
+                /* La roue prend un % de la hauteur pour s'adapter parfaitement */
+                --wheel-size: 60vh; 
+            }
+            
             .ticker { border-left-width: 15px; border-right-width: 15px; border-top-width: 25px; }
             .wheel { border-width: 5px; }
             #spin-button { font-size: 16px; padding: 10px 25px; }
@@ -152,7 +170,8 @@
     </style>
 </head>
 <body>
-    <div id="bg-animation"></div> <div id="confetti-animation-1" class="confetti-container"></div>
+    <div id="bg-animation"></div>
+    <div id="confetti-animation-1" class="confetti-container"></div>
     <div id="confetti-animation-2" class="confetti-container"></div>
     <div id="confetti-animation-3" class="confetti-container"></div>
 
@@ -180,8 +199,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
     <script>
-        // Le JavaScript est presque identique, on réactive juste la ligne pour l'animation de fond
-        
+        // Le JavaScript n'a pas besoin d'être modifié.
         const participants = ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Frank', 'Grace', 'Heidi', 'Ivan', 'Judy', 'Kevin', 'Liam'];
         const predefinedWinners = ['David', 'Judy', 'Alice', 'Frank']; 
         const segmentColors = ["#6A1B9A", "#8E24AA", "#AB47BC", "#BA68C8"];
@@ -199,7 +217,6 @@
         const tickSound = new Howl({ src: ['sounds/tick.mp3'], loop: true, volume: 0.8 });
         const winSound = new Howl({ src: ['sounds/win.mp3'], volume: 0.7 });
         
-        // --- RÉACTIVATION DE L'ANIMATION DE FOND ---
         const bgAnimation = lottie.loadAnimation({ container: document.getElementById('bg-animation'), renderer: 'svg', loop: true, autoplay: true, path: 'fond.json' });
         const glowAnimation = lottie.loadAnimation({ container: document.getElementById('glow-animation'), renderer: 'canvas', loop: true, autoplay: true, path: 'lueur.json', rendererSettings: { assetsPath: 'images/' } });
         const confettiAnimation1 = lottie.loadAnimation({ container: confettiDiv1, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
@@ -207,7 +224,6 @@
         const confettiAnimation3 = lottie.loadAnimation({ container: confettiDiv3, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
         confettiAnimation2.setDirection(-1);
 
-        // Le reste du script reste inchangé
         function createWheel() {
             const numSegments = participants.length;
             const anglePerSegment = 360 / numSegments;
