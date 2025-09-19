@@ -8,9 +8,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Montserrat:wght@800&display=swap');
 
         :root {
-            /* --- DERNIER AJUSTEMENT DE TAILLE --- */
-            --wheel-size: 420px;
-            --title-size: 290px; 
+            --wheel-size: 450px; /* On peut légèrement agrandir la roue */
         }
 
         body {
@@ -22,15 +20,30 @@
             color: white;
             display: flex;
             align-items: center;
+            justify-content: center; /* On recentre juste la roue et le bouton */
             height: 100vh;
             overflow: hidden;
+            position: relative; /* Nécessaire pour le positionnement des coins */
         }
 
         #bg-animation {
             position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1;
+            width: 100%; height: 100%; z-index: -1;
         }
+
+        /* --- NOUVEAU : Style pour les images dans les coins --- */
+        .corner-image {
+            position: fixed;
+            width: 220px; /* Taille des images */
+            height: auto;
+            z-index: 10;
+            opacity: 0.9;
+        }
+        #top-left { top: 20px; left: 20px; }
+        #top-right { top: 20px; right: 20px; }
+        #bottom-left { bottom: 20px; left: 20px; }
+        #bottom-right { bottom: 20px; right: 20px; }
+
 
         .confetti-container {
             position: fixed; top: 0; left: 0;
@@ -47,20 +60,13 @@
         }
 
         .main-container {
-            width: 100%;
-            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* --- NOUVELLE GESTION DE L'ESPACEMENT --- */
-            justify-content: space-evenly; 
+            justify-content: center; /* Centrage vertical de la roue et du bouton */
+            gap: 30px;
         }
         
-        .title-image {
-            width: var(--title-size);
-            max-width: 90%; height: auto;
-        }
-
         .wheel-container {
             position: relative; width: var(--wheel-size); height: var(--wheel-size);
             max-width: 95vw; max-height: 80vh;
@@ -132,34 +138,35 @@
             text-shadow: 0 0 10px #000, 0 0 20px #000;
         }
         
-        @media (min-height: 850px) {
-             :root {
-                --wheel-size: 500px;
-                --title-size: 450px;
+        @media (max-width: 768px) {
+            .corner-image {
+                width: 150px;
+            }
+        }
+        
+        @media (max-width: 500px) {
+            .corner-image {
+                width: 100px;
+                top: 10px; left: 10px; right: 10px; bottom: 10px;
             }
         }
 
-        @media (max-height: 700px) and (orientation: landscape), (max-width: 400px) {
-            body { justify-content: center; }
-            .title-image { position: absolute; top: 15px; left: 15px; width: 180px; z-index: 20; }
-            .main-container { padding-top: 0; gap: 15px; }
-            :root { --wheel-size: 60vh; }
-            .ticker { border-left-width: 15px; border-right-width: 15px; border-top-width: 25px; }
-            .wheel { border-width: 5px; }
-            #spin-button { font-size: 16px; padding: 10px 25px; }
-        }
     </style>
 </head>
 <body>
     <div id="bg-animation"></div>
+
+    <img src="Win1000AED.png" alt="Titre" class="corner-image" id="top-left">
+    <img src="Win1000AED.png" alt="Titre" class="corner-image" id="top-right">
+    <img src="Win1000AED.png" alt="Titre" class="corner-image" id="bottom-left">
+    <img src="Win1000AED.png" alt="Titre" class="corner-image" id="bottom-right">
+
     <div id="confetti-animation-1" class="confetti-container"></div>
     <div id="confetti-animation-2" class="confetti-container"></div>
     <div id="confetti-animation-3" class="confetti-container"></div>
     <div id="confetti-animation-4" class="confetti-container"></div>
     
     <div class="main-container">
-        <img src="Win1000AED.png" alt="Titre du jeu" class="title-image">
-        
         <div class="wheel-container">
             <div class="ticker"></div>
             <div class="wheel-center"></div>
@@ -181,6 +188,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
     <script>
+        // Le JavaScript reste identique, aucune modification n'est nécessaire ici.
         const participants = ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Frank', 'Grace', 'Heidi', 'Ivan', 'Judy', 'Kevin', 'Liam'];
         const predefinedWinners = ['David', 'Judy', 'Alice', 'Frank']; 
         const segmentColors = ["#6A1B9A", "#8E24AA", "#AB47BC", "#BA68C8"];
@@ -199,7 +207,6 @@
         const tickSound = new Howl({ src: ['sounds/tick.mp3'], loop: true, volume: 0.8 });
         const winSound = new Howl({ src: ['sounds/win.mp3'], volume: 0.7 });
         
-        // --- CORRECTION POUR QUE LE FOND TOUCHE LES BORDS ---
         const bgAnimation = lottie.loadAnimation({
             container: document.getElementById('bg-animation'),
             renderer: 'svg',
@@ -207,7 +214,7 @@
             autoplay: true,
             path: 'fond.json',
             rendererSettings: {
-                preserveAspectRatio: 'xMidYMid slice' // Force l'animation à couvrir toute la zone
+                preserveAspectRatio: 'xMidYMid slice'
             }
         });
 
