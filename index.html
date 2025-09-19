@@ -32,7 +32,7 @@
             z-index: -1;
         }
 
-        #confetti-animation {
+        .confetti-container { /* Style commun pour les deux couches de confettis */
             position: fixed;
             top: 0;
             left: 0;
@@ -142,9 +142,8 @@
 <body>
 
     <div id="bg-animation"></div>
-    <div id="confetti-animation"></div>
-
-    <div class="main-container">
+    <div id="confetti-animation-1" class="confetti-container"></div>
+    <div id="confetti-animation-2" class="confetti-container"></div> <div class="main-container">
         <div class="wheel-container">
             <div class="ticker"></div>
             <div id="glow-animation"></div>
@@ -167,19 +166,26 @@
             'Grace', 'Heidi', 'Ivan', 'Judy', 'Kevin', 'Liam'
         ];
         
-        const segmentColors = ["#6A1B9A", "#8E24AA", "#AB47BC", "#BA68C8"]; // Palette de violets
-        const spinDuration = 8; // en secondes
-        const totalSpins = 6; // Nombre de tours complets
+        const segmentColors = ["#6A1B9A", "#8E24AA", "#AB47BC", "#BA68C8"];
+        const spinDuration = 8;
+        const totalSpins = 6;
 
         // --- ELEMENTS DU DOM ---
         const wheelDiv = document.getElementById('wheel');
         const spinButton = document.getElementById('spin-button');
+        const confettiDiv1 = document.getElementById('confetti-animation-1');
+        const confettiDiv2 = document.getElementById('confetti-animation-2');
 
-        // --- INITIALISATION DU SON ---
+        // --- INITIALISATION DES SONS ---
         const tickSound = new Howl({
-            src: ['https://assets.codepen.io/605876/tick.mp3'], // <-- LIEN DU SON CORRIGÉ
+            src: ['https://soundbible.com/mp3/Tick-Tock-Sound-Effect-1 ticking.mp3'], // <-- LIEN DU SON CORRIGÉ
             loop: true,
-            volume: 0.6
+            volume: 0.8
+        });
+        
+        const winSound = new Howl({
+            src: ['https://soundbible.com/mp3/Tada-sound.mp3'], // <-- NOUVEAU SON DE VICTOIRE
+            volume: 0.7
         });
         
         // --- CHARGEMENT DES ANIMATIONS LOTTIE ---
@@ -198,12 +204,20 @@
             autoplay: true,
             path: 'lueur.json',
             rendererSettings: {
-                assetsPath: 'images/' // <-- CHEMIN DE L'IMAGE AJOUTÉ
+                assetsPath: 'images/'
             }
         });
 
-        const confettiAnimation = lottie.loadAnimation({
-            container: document.getElementById('confetti-animation'),
+        const confettiAnimation1 = lottie.loadAnimation({
+            container: confettiDiv1,
+            renderer: 'svg',
+            loop: false,
+            autoplay: false,
+            path: 'confettis.json'
+        });
+
+        const confettiAnimation2 = lottie.loadAnimation({ // DEUXIÈME ANIMATION DE CONFETTIS
+            container: confettiDiv2,
             renderer: 'svg',
             loop: false,
             autoplay: false,
@@ -223,7 +237,6 @@
                 const startAngle = i * anglePerSegment;
                 const endAngle = startAngle + anglePerSegment;
 
-                // Créer le segment (portion de cercle)
                 const path = document.createElementNS(svgNS, "path");
                 const x1 = 250 + 250 * Math.cos(Math.PI * startAngle / 180);
                 const y1 = 250 + 250 * Math.sin(Math.PI * startAngle / 180);
@@ -234,14 +247,12 @@
                 path.setAttribute("fill", segmentColors[i % segmentColors.length]);
                 svg.appendChild(path);
 
-                // Ajouter le texte
                 const textAngle = startAngle + anglePerSegment / 2;
                 const text = document.createElementNS(svgNS, "text");
                 text.setAttribute("x", "250");
                 text.setAttribute("y", "250");
                 text.setAttribute("dy", "0.35em");
                 text.setAttribute("class", "segment-text");
-                // Rotation et positionnement du texte
                 const textTransform = `
                     rotate(${textAngle}, 250, 250)
                     translate(150, 0)
@@ -263,11 +274,9 @@
             isSpinning = true;
             spinButton.disabled = true;
             
-            // Simule le choix d'un gagnant (pour l'instant aléatoire)
             const winnerIndex = Math.floor(Math.random() * participants.length);
             const winner = participants[winnerIndex];
 
-            // Calcul de l'angle final
             const anglePerSegment = 360 / participants.length;
             const targetAngle = (winnerIndex * anglePerSegment) + (anglePerSegment / 2);
             const finalRotation = (360 * totalSpins) + targetAngle - (currentRotation % 360);
@@ -291,16 +300,25 @@
         function announceWinner(winnerName) {
             console.log("Le gagnant est :", winnerName);
 
-            // Jouer les confettis
-            confettiAnimation.goToAndPlay(0);
-            document.getElementById('confetti-animation').style.display = 'block';
+            // Jouer le son de victoire et les confettis
+            winSound.play();
+            
+            confettiDiv1.style.display = 'block';
+            confettiAnimation1.goToAndPlay(0);
+            
+            // Lance la deuxième animation de confettis avec un léger décalage
+            setTimeout(() => {
+                confettiDiv2.style.display = 'block';
+                confettiAnimation2.goToAndPlay(0);
+            }, 300); // 300ms de décalage
 
             // Réactiver le bouton après un délai pour permettre de relancer
             setTimeout(() => {
-                document.getElementById('confetti-animation').style.display = 'none';
+                confettiDiv1.style.display = 'none';
+                confettiDiv2.style.display = 'none';
                 spinButton.disabled = false;
                 alert(`Félicitations à ${winnerName} !`);
-            }, 4000); // 4 secondes
+            }, 4000);
         }
 
         // --- Initialisation ---
