@@ -11,13 +11,11 @@
             background-color: #f5f5f7;
             color: #1d1d1f;
         }
-
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 30px;
         }
-
         h1 {
             font-size: 32px;
             font-weight: 900;
@@ -25,7 +23,6 @@
             letter-spacing: 1px;
             margin: 0 0 40px 0;
         }
-
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -33,7 +30,6 @@
             gap: 30px;
             height: calc(100vh - 140px);
         }
-
         .card {
             background-color: #ffffff;
             border: 1px solid #d2d2d7;
@@ -41,21 +37,17 @@
             border-radius: 18px;
             padding: 30px;
         }
-
         .session-card {
-            grid-column: 1 / -1; /* Prend toute la largeur */
+            grid-column: 1 / -1;
         }
-        
         .participants-card {
             grid-column: 1 / 2;
             display: flex;
             flex-direction: column;
         }
-        
         .winners-card {
             grid-column: 2 / 3;
         }
-
         .card h2 {
             font-size: 22px;
             font-weight: 900;
@@ -63,7 +55,6 @@
             border-bottom: 1px solid #e8e8e8;
             padding-bottom: 15px;
         }
-
         #create-session-btn {
             width: 100%;
             padding: 14px;
@@ -79,12 +70,10 @@
         #create-session-btn:hover {
             background-color: #333333;
         }
-
         #session-links {
             margin-top: 20px;
-            display: none; /* Caché par défaut */
+            display: none;
         }
-
         .link-group {
             margin-bottom: 15px;
         }
@@ -115,7 +104,6 @@
             cursor: pointer;
         }
         .copy-btn:hover { background-color: #f5f5f7; }
-
         #participant-list {
             list-style: none;
             padding: 0;
@@ -137,7 +125,6 @@
             color: white;
             font-weight: 600;
         }
-
         .winner-slot {
             background-color: #f5f5f7;
             border: 1px dashed #d2d2d7;
@@ -156,14 +143,11 @@
             border-color: #007aff;
             font-weight: 600;
         }
-        
     </style>
 </head>
 <body>
-
     <div class="container">
         <h1>TABLEAU DE BORD ADMINISTRATEUR</h1>
-
         <div class="dashboard-grid">
             <div class="card session-card">
                 <h2>Session de Jeu</h2>
@@ -181,13 +165,11 @@
                     </div>
                 </div>
             </div>
-
             <div class="card participants-card">
                 <h2>Participants Inscrits (<span id="participant-count">0</span>)</h2>
                 <ul id="participant-list">
-                    </ul>
+                </ul>
             </div>
-
             <div class="card winners-card">
                 <h2>Gagnants Sélectionnés</h2>
                 <div class="winner-slot" id="winner-slot-0"><span class="label">1er Gagnant :</span><span class="name"></span></div>
@@ -198,8 +180,30 @@
         </div>
     </div>
 
+    <!-- ===== BLOC FIREBASE (À NE PAS MODIFIER) ===== -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      // On importe les fonctions de Firestore
+      import { getFirestore, collection, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
+        authDomain: "roue-de-la-chance-c0f6a.firebaseapp.com",
+        projectId: "roue-de-la-chance-c0f6a",
+        storageBucket: "roue-de-la-chance-c0f6a.appspot.com",
+        messagingSenderId: "491916732335",
+        appId: "1:491916732335:web:7a9765b2720d995583315a"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      window.db = db;
+      window.firestoreFunctions = { collection, onSnapshot, doc, setDoc };
+    </script>
+    <!-- ============================================= -->
+    
     <script>
-        // --- ÉLÉMENTS DU DOM ---
         const createSessionBtn = document.getElementById('create-session-btn');
         const sessionLinksDiv = document.getElementById('session-links');
         const inscriptionLinkInput = document.getElementById('inscription-link');
@@ -214,17 +218,15 @@
             document.querySelector('#winner-slot-3 .name')
         ];
         
-        // --- ÉTAT DE L'APPLICATION (SIMULÉ) ---
         let participants = [];
         let winnerSlots = [null, null, null, null];
 
-        // --- GESTION DE LA SESSION ---
         createSessionBtn.addEventListener('click', () => {
             const sessionId = `session-${Date.now().toString(36)}`;
-            const baseUrl = 'https://opikorporation.github.io/touteterrasky/'; // VOTRE URL
+            const baseUrl = 'https://opikorporation.github.io/touteterrasky/';
             
             inscriptionLinkInput.value = `${baseUrl}formulaire.html?session=${sessionId}`;
-            wheelLinkInput.value = `${baseUrl}?session=${sessionId}`; // La roue sera la page d'accueil
+            wheelLinkInput.value = `${baseUrl}?session=${sessionId}`;
             
             sessionLinksDiv.style.display = 'block';
             createSessionBtn.disabled = true;
@@ -241,37 +243,30 @@
             });
         });
 
-        // --- GESTION DES PARTICIPANTS ---
         function addParticipant(participant) {
             participants.push(participant);
-            
             const li = document.createElement('li');
             li.textContent = participant.pseudo;
-            li.dataset.pseudo = participant.pseudo; // Stocke le pseudo pour l'identifier
-            
+            li.dataset.pseudo = participant.pseudo;
             participantList.appendChild(li);
             participantCountSpan.textContent = participants.length;
         }
 
-        // --- GESTION DE LA SÉLECTION DES GAGNANTS ---
         participantList.addEventListener('click', (event) => {
             if (event.target && event.target.tagName === 'LI') {
                 const selectedPseudo = event.target.dataset.pseudo;
                 const isAlreadyWinner = winnerSlots.includes(selectedPseudo);
-
                 if (isAlreadyWinner) {
-                    // Si déjà gagnant, on le désélectionne
                     const winnerIndex = winnerSlots.indexOf(selectedPseudo);
                     winnerSlots[winnerIndex] = null;
                     event.target.classList.remove('selected');
                 } else {
-                    // Sinon, on cherche une place libre
                     const emptySlotIndex = winnerSlots.indexOf(null);
                     if (emptySlotIndex !== -1) {
                         winnerSlots[emptySlotIndex] = selectedPseudo;
                         event.target.classList.add('selected');
                     } else {
-                        alert("Toutes les places de gagnant sont déjà sélectionnées. Désélectionnez un gagnant pour en choisir un autre.");
+                        alert("Toutes les places de gagnant sont déjà sélectionnées.");
                     }
                 }
                 updateWinnerSlotsUI();
@@ -292,10 +287,7 @@
             });
         }
 
-
-        // --- SIMULATION : AJOUT DE PARTICIPANTS EN TEMPS RÉEL ---
-        // Dans une vraie application, vous utiliseriez WebSocket ou des appels serveur (AJAX)
-        // pour recevoir les nouveaux inscrits.
+        // La simulation sera remplacée par un vrai appel à Firebase
         const sampleParticipants = [
             { pseudo: 'SuperJoueur92' }, { pseudo: 'Lina_DXB' }, { pseudo: 'MarcDubai' }, 
             { pseudo: 'TheWinner' }, { pseudo: 'LuckyStar' }, { pseudo: 'JojoLePro' }, 
@@ -307,10 +299,9 @@
                 addParticipant(sampleParticipants[participantIndex]);
                 participantIndex++;
             } else {
-                clearInterval(intervalId); // Arrête d'ajouter des participants
+                clearInterval(intervalId);
             }
-        }, 3000); // Ajoute un nouveau participant toutes les 3 secondes
-
+        }, 3000);
     </script>
 </body>
 </html>
