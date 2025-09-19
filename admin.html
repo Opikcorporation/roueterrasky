@@ -215,7 +215,7 @@
 
         createSessionBtn.addEventListener('click', () => {
             currentSessionId = `session-${Date.now().toString(36)}`;
-            const baseUrl = window.location.href.replace('admin.html', '');
+            const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
             
             inscriptionLinkInput.value = `${baseUrl}formulaire.html?session=${currentSessionId}`;
             wheelLinkInput.value = `${baseUrl}index.html?session=${currentSessionId}`;
@@ -307,4 +307,3 @@
     </script>
 </body>
 </html>
-
