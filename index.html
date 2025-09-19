@@ -8,20 +8,19 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Montserrat:wght@800&display=swap');
 
         :root {
+            /* --- DERNIER AJUSTEMENT DE TAILLE --- */
             --wheel-size: 420px;
-            --title-size: 320px;
+            --title-size: 290px; 
         }
 
         body {
             margin: 0;
-            padding: 10px 20px;
+            padding: 20px;
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
             background-color: #1a023b;
             color: white;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
             height: 100vh;
             overflow: hidden;
@@ -29,7 +28,8 @@
 
         #bg-animation {
             position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; z-index: -1;
+            width: 100%; height: 100%;
+            z-index: -1;
         }
 
         .confetti-container {
@@ -37,27 +37,28 @@
             width: 100%; height: 100%;
             pointer-events: none; display: none;
         }
-        
-        /* --- NOUVEAU Z-INDEX POUR LES DEUX TYPES DE CONFETTIS --- */
-        /* Confettis devant le fond noir (type 1) */
-        #confetti-animation-1 { z-index: 202; } /* Juste devant le texte gagnant (z-index 201) */
+        #confetti-animation-1 { z-index: 202; }
         #confetti-animation-2 { z-index: 203; }
-
-        /* Confettis derrière le fond noir (type 2) */
-        #confetti-animation-3 { z-index: 198; } /* Derrière le fond noir (z-index 200) */
-        #confetti-animation-4 { z-index: 199; } /* Derrière le fond noir (z-index 200) */
+        #confetti-animation-3 { z-index: 198; }
+        #confetti-animation-4 { z-index: 199; }
         
         #glow-animation {
             position: absolute; width: 130%; height: 130%; z-index: 1;
         }
 
         .main-container {
-            display: flex; flex-direction: column;
-            align-items: center; gap: 15px; width: 100%;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* --- NOUVELLE GESTION DE L'ESPACEMENT --- */
+            justify-content: space-evenly; 
         }
         
         .title-image {
-            width: var(--title-size); max-width: 90%; height: auto;
+            width: var(--title-size);
+            max-width: 90%; height: auto;
         }
 
         .wheel-container {
@@ -109,13 +110,13 @@
         .winner-popup {
             position: fixed; top: 0; left: 0;
             width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8);
-            z-index: 200; /* Le fond noir transparent est à 200 */
+            z-index: 200;
             display: none; justify-content: center;
             align-items: center; cursor: pointer;
         }
         
         .winner-popup .winner-content {
-            position: relative; z-index: 201; /* Le contenu du gagnant est à 201 */
+            position: relative; z-index: 201;
             text-align: center;
         }
 
@@ -154,7 +155,9 @@
     <div id="confetti-animation-1" class="confetti-container"></div>
     <div id="confetti-animation-2" class="confetti-container"></div>
     <div id="confetti-animation-3" class="confetti-container"></div>
-    <div id="confetti-animation-4" class="confetti-container"></div> <div class="main-container">
+    <div id="confetti-animation-4" class="confetti-container"></div>
+    
+    <div class="main-container">
         <img src="Win1000AED.png" alt="Titre du jeu" class="title-image">
         
         <div class="wheel-container">
@@ -189,24 +192,33 @@
         const confettiDiv1 = document.getElementById('confetti-animation-1');
         const confettiDiv2 = document.getElementById('confetti-animation-2');
         const confettiDiv3 = document.getElementById('confetti-animation-3');
-        const confettiDiv4 = document.getElementById('confetti-animation-4'); // NOUVEL ÉLÉMENT
+        const confettiDiv4 = document.getElementById('confetti-animation-4');
         const winnerPopup = document.getElementById('winner-popup');
         const winnerNameDisplay = document.getElementById('winner-name-display');
 
         const tickSound = new Howl({ src: ['sounds/tick.mp3'], loop: true, volume: 0.8 });
         const winSound = new Howl({ src: ['sounds/win.mp3'], volume: 0.7 });
         
-        const bgAnimation = lottie.loadAnimation({ container: document.getElementById('bg-animation'), renderer: 'svg', loop: true, autoplay: true, path: 'fond.json' });
+        // --- CORRECTION POUR QUE LE FOND TOUCHE LES BORDS ---
+        const bgAnimation = lottie.loadAnimation({
+            container: document.getElementById('bg-animation'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: 'fond.json',
+            rendererSettings: {
+                preserveAspectRatio: 'xMidYMid slice' // Force l'animation à couvrir toute la zone
+            }
+        });
+
         const glowAnimation = lottie.loadAnimation({ container: document.getElementById('glow-animation'), renderer: 'canvas', loop: true, autoplay: true, path: 'lueur.json', rendererSettings: { assetsPath: 'images/' } });
         
-        // --- NOUVELLES DÉFINITIONS D'ANIMATIONS DE CONFETTIS ---
         const confettiAnimation1 = lottie.loadAnimation({ container: confettiDiv1, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
         const confettiAnimation2 = lottie.loadAnimation({ container: confettiDiv2, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
         
-        const confettiAnimation3 = lottie.loadAnimation({ container: confettiDiv3, renderer: 'svg', loop: false, autoplay: false, path: 'confettis2.json' }); // UTILISE confettis2.json
-        const confettiAnimation4 = lottie.loadAnimation({ container: confettiDiv4, renderer: 'svg', loop: false, autoplay: false, path: 'confettis2.json' }); // UTILISE confettis2.json
+        const confettiAnimation3 = lottie.loadAnimation({ container: confettiDiv3, renderer: 'svg', loop: false, autoplay: false, path: 'confettis2.json' });
+        const confettiAnimation4 = lottie.loadAnimation({ container: confettiDiv4, renderer: 'svg', loop: false, autoplay: false, path: 'confettis2.json' });
 
-        // Vous pouvez ajuster les directions si vous voulez plus de variété
         confettiAnimation2.setDirection(-1); 
         confettiAnimation4.setDirection(-1);
 
@@ -266,26 +278,24 @@
             winnerNameDisplay.textContent = winnerName;
             winnerPopup.style.display = 'flex';
             
-            // --- NOUVELLE LOGIQUE D'AFFICHAGE DES CONFETTIS ---
-            confettiDiv1.style.display = 'block'; // Devant
+            confettiDiv1.style.display = 'block';
             confettiAnimation1.goToAndPlay(0);
             
-            confettiDiv3.style.display = 'block'; // Derrière
+            confettiDiv3.style.display = 'block';
             confettiAnimation3.goToAndPlay(0);
 
             setTimeout(() => {
-                confettiDiv2.style.display = 'block'; // Devant
+                confettiDiv2.style.display = 'block';
                 confettiAnimation2.goToAndPlay(0);
             }, 300);
             setTimeout(() => {
-                confettiDiv4.style.display = 'block'; // Derrière
+                confettiDiv4.style.display = 'block';
                 confettiAnimation4.goToAndPlay(0);
-            }, 450); // Léger décalage pour le 2ème arrière
+            }, 450);
         }
 
         winnerPopup.addEventListener('click', () => {
             winnerPopup.style.display = 'none';
-            // Cache tous les conteneurs de confettis
             confettiDiv1.style.display = 'none';
             confettiDiv2.style.display = 'none';
             confettiDiv3.style.display = 'none';
