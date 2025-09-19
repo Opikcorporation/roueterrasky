@@ -180,11 +180,9 @@
         </div>
     </div>
 
-    <!-- ===== BLOC FIREBASE (À NE PAS MODIFIER) ===== -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
       import { getFirestore, collection, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
       const firebaseConfig = {
         apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
         authDomain: "roue-de-la-chance-c0f6a.firebaseapp.com",
@@ -193,14 +191,10 @@
         messagingSenderId: "491916732335",
         appId: "1:491916732335:web:7a9765b2720d995583315a"
       };
-
       const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-
-      window.db = db;
+      window.db = getFirestore(app);
       window.firestoreFunctions = { collection, onSnapshot, doc, setDoc };
     </script>
-    <!-- ============================================= -->
     
     <script>
         const createSessionBtn = document.getElementById('create-session-btn');
@@ -211,56 +205,44 @@
         const participantCountSpan = document.getElementById('participant-count');
         const copyBtns = document.querySelectorAll('.copy-btn');
         const winnerSlotsUI = [
-            document.querySelector('#winner-slot-0 .name'),
-            document.querySelector('#winner-slot-1 .name'),
-            document.querySelector('#winner-slot-2 .name'),
-            document.querySelector('#winner-slot-3 .name')
+            document.querySelector('#winner-slot-0 .name'), document.querySelector('#winner-slot-1 .name'),
+            document.querySelector('#winner-slot-2 .name'), document.querySelector('#winner-slot-3 .name')
         ];
         
-        let participants = []; // Gardera la liste des participants en mémoire
+        let participants = [];
         let winnerSlots = [null, null, null, null];
         let currentSessionId = null;
 
         createSessionBtn.addEventListener('click', () => {
             currentSessionId = `session-${Date.now().toString(36)}`;
-            const baseUrl = 'https://opikorporation.github.io/touteterrasky/';
+            const baseUrl = window.location.href.replace('admin.html', '');
             
             inscriptionLinkInput.value = `${baseUrl}formulaire.html?session=${currentSessionId}`;
-            wheelLinkInput.value = `${baseUrl}?session=${currentSessionId}`;
+            wheelLinkInput.value = `${baseUrl}index.html?session=${currentSessionId}`;
             
             sessionLinksDiv.style.display = 'block';
             createSessionBtn.disabled = true;
             createSessionBtn.textContent = 'Session Créée !';
-
-            // Démarrer l'écoute des participants pour cette session
             listenForParticipants(currentSessionId);
         });
 
-        // --- NOUVEAU : Écoute en temps réel des participants ---
         function listenForParticipants(sessionId) {
             const { db, firestoreFunctions } = window;
             const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
-
             firestoreFunctions.onSnapshot(participantsRef, (snapshot) => {
-                participantList.innerHTML = ''; // Vide la liste pour la reconstruire
-                participants = []; // Vide le tableau local
-
+                participantList.innerHTML = '';
+                participants = [];
                 snapshot.docs.forEach(doc => {
                     const participantData = doc.data();
-                    participants.push(participantData); // Ajoute au tableau local
-                    
+                    participants.push(participantData);
                     const li = document.createElement('li');
                     li.textContent = participantData.pseudo;
                     li.dataset.pseudo = participantData.pseudo;
-                    
-                    // Si le participant est un gagnant sélectionné, on garde le style
                     if (winnerSlots.includes(participantData.pseudo)) {
                         li.classList.add('selected');
                     }
-
                     participantList.appendChild(li);
                 });
-
                 participantCountSpan.textContent = participants.length;
             });
         }
@@ -293,7 +275,7 @@
                     }
                 }
                 updateWinnerSlotsUI();
-                saveWinnersToFirebase(); // On sauvegarde les gagnants à chaque changement
+                saveWinnersToFirebase();
             }
         });
         
@@ -311,7 +293,6 @@
             });
         }
 
-        // --- NOUVEAU : Sauvegarde des gagnants dans Firebase ---
         async function saveWinnersToFirebase() {
             if (!currentSessionId) return;
             const { db, firestoreFunctions } = window;
