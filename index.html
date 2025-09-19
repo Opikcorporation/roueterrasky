@@ -176,8 +176,6 @@
         const spinButton = document.getElementById('spin-button');
 
         // --- INITIALISATION DU SON ---
-        // Son de "tic-tic" pendant la rotation
-        // Source: https://cdn.freesound.org/previews/51/51624_10043-lq.mp3
         const tickSound = new Howl({
             src: ['https://cdn.freesound.org/previews/51/51624_10043-lq.mp3'],
             loop: true,
@@ -190,7 +188,7 @@
             renderer: 'svg',
             loop: true,
             autoplay: true,
-            path: 'fond.json'
+            path: './fond.json' // CORRIGÉ
         });
 
         const glowAnimation = lottie.loadAnimation({
@@ -198,7 +196,7 @@
             renderer: 'svg',
             loop: true,
             autoplay: true,
-            path: 'lueur.json'
+            path: './lueur.json' // CORRIGÉ
         });
 
         const confettiAnimation = lottie.loadAnimation({
@@ -206,7 +204,7 @@
             renderer: 'svg',
             loop: false,
             autoplay: false,
-            path: 'confettis.json'
+            path: './confettis.json' // CORRIGÉ
         });
 
 
@@ -263,15 +261,12 @@
             spinButton.disabled = true;
             
             // Simule le choix d'un gagnant (pour l'instant aléatoire)
-            // Dans la version finale, ce sera le gagnant que vous avez prédéfini
             const winnerIndex = Math.floor(Math.random() * participants.length);
             const winner = participants[winnerIndex];
 
             // Calcul de l'angle final
             const anglePerSegment = 360 / participants.length;
-            // Centre le pointeur au milieu du segment gagnant
             const targetAngle = (winnerIndex * anglePerSegment) + (anglePerSegment / 2);
-            // Angle de rotation final, incluant plusieurs tours
             const finalRotation = (360 * totalSpins) + targetAngle - (currentRotation % 360);
 
             tickSound.play();
@@ -280,9 +275,6 @@
                 rotation: `+=${finalRotation}`,
                 duration: spinDuration,
                 ease: "power3.out",
-                onUpdate: () => {
-                    // Pourrait être utilisé pour ajuster le son, etc.
-                },
                 onComplete: () => {
                     tickSound.stop();
                     currentRotation += finalRotation;
