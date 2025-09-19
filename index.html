@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roue de la Chance</title>
+    <style>
+        /* --- Styles Généraux --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a023b;
+            overflow: hidden;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        /* --- Animations Lottie --- */
+        #bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        #confetti-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+            pointer-events: none;
+            display: none; /* Caché par défaut */
+        }
+        
+        #glow-animation {
+            position: absolute;
+            width: 130%; /* Plus grand que la roue */
+            height: 130%;
+            z-index: 1;
+        }
+
+        /* --- Conteneur Principal --- */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        /* --- Conteneur de la Roue --- */
+        .wheel-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            border: 10px solid #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            z-index: 2;
+            transition: transform 5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* --- Pointeur --- */
+        .ticker {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-top: 40px solid #FFD700; /* Couleur Or */
+            z-index: 5;
+            filter: drop-shadow(0px 5px 3px rgba(0,0,0,0.4));
+        }
+
+        /* --- Segments et Texte de la Roue (généré par JS) --- */
+        .wheel svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .wheel .segment-text {
+            font-size: 16px;
+            font-weight: 700;
+            fill: #fff;
+            text-anchor: middle;
+        }
+
+        /* --- Bouton pour Lancer --- */
+        #spin-button {
+            padding: 15px 40px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #4a148c;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.2s ease-in-out;
+            z-index: 10;
+        }
+
+        #spin-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        #spin-button:disabled {
+            cursor: not-allowed;
+            background: #ccc;
+            transform: scale(1);
+            box-shadow: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="bg-animation"></div>
+    <div id="confetti-animation"></div>
+
+    <div class="main-container">
+        <div class="wheel-container">
+            <div class="ticker"></div>
+            <div id="glow-animation"></div>
+            <div class="wheel" id="wheel">
+                </div>
+        </div>
+
+        <button id="spin-button">Lancer la Roue</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+
+
+    <script>
+        // --- CONFIGURATION ---
+        const participants = [
+            'Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Frank', 
+            'Grace', 'Heidi', 'Ivan', 'Judy', 'Kevin', 'Liam'
+        ];
+        
+        const segmentColors = ["#6A1B9A", "#8E24AA", "#AB47BC", "#BA68C8"]; // Palette de violets
+        const spinDuration = 8; // en secondes
+        const totalSpins = 6; // Nombre de tours complets
+
+        // --- ELEMENTS DU DOM ---
+        const wheelDiv = document.getElementById('wheel');
+        const spinButton = document.getElementById('spin-button');
+
+        // --- INITIALISATION DU SON ---
+        // Son de "tic-tic" pendant la rotation
+        // Source: https://cdn.freesound.org/previews/51/51624_10043-lq.mp3
+        const tickSound = new Howl({
+            src: ['https://cdn.freesound.org/previews/51/51624_10043-lq.mp3'],
+            loop: true,
+            volume: 0.6
+        });
+        
+        // --- CHARGEMENT DES ANIMATIONS LOTTIE ---
+        const bgAnimation = lottie.loadAnimation({
+            container: document.getElementById('bg-animation'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: 'fond.json'
+        });
+
+        const glowAnimation = lottie.loadAnimation({
+            container: document.getElementById('glow-animation'),
+            renderer: 'svg',
+            loop: true,
+            autoplay: true,
+            path: 'lueur.json'
+        });
+
+        const confettiAnimation = lottie.loadAnimation({
+            container: document.getElementById('confetti-animation'),
+            renderer: 'svg',
+            loop: false,
+            autoplay: false,
+            path: 'confettis.json'
+        });
+
+
+        // --- CREATION DE LA ROUE ---
+        function createWheel() {
+            const numSegments = participants.length;
+            const anglePerSegment = 360 / numSegments;
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("viewBox", "0 0 500 500");
+
+            participants.forEach((name, i) => {
+                const startAngle = i * anglePerSegment;
+                const endAngle = startAngle + anglePerSegment;
+
+                // Créer le segment (portion de cercle)
+                const path = document.createElementNS(svgNS, "path");
+                const x1 = 250 + 250 * Math.cos(Math.PI * startAngle / 180);
+                const y1 = 250 + 250 * Math.sin(Math.PI * startAngle / 180);
+                const x2 = 250 + 250 * Math.cos(Math.PI * endAngle / 180);
+                const y2 = 250 + 250 * Math.sin(Math.PI * endAngle / 180);
+                
+                path.setAttribute("d", `M250,250 L${x1},${y1} A250,250 0 0,1 ${x2},${y2} z`);
+                path.setAttribute("fill", segmentColors[i % segmentColors.length]);
+                svg.appendChild(path);
+
+                // Ajouter le texte
+                const textAngle = startAngle + anglePerSegment / 2;
+                const text = document.createElementNS(svgNS, "text");
+                text.setAttribute("x", "250");
+                text.setAttribute("y", "250");
+                text.setAttribute("dy", "0.35em");
+                text.setAttribute("class", "segment-text");
+                // Rotation et positionnement du texte
+                const textTransform = `
+                    rotate(${textAngle}, 250, 250)
+                    translate(150, 0)
+                    rotate(-90, 0, 0)
+                `;
+                text.setAttribute("transform", textTransform);
+                text.textContent = name;
+                svg.appendChild(text);
+            });
+            wheelDiv.appendChild(svg);
+        }
+
+        // --- LOGIQUE DU LANCÉ ---
+        let isSpinning = false;
+        let currentRotation = 0;
+
+        spinButton.addEventListener('click', () => {
+            if (isSpinning) return;
+            isSpinning = true;
+            spinButton.disabled = true;
+            
+            // Simule le choix d'un gagnant (pour l'instant aléatoire)
+            // Dans la version finale, ce sera le gagnant que vous avez prédéfini
+            const winnerIndex = Math.floor(Math.random() * participants.length);
+            const winner = participants[winnerIndex];
+
+            // Calcul de l'angle final
+            const anglePerSegment = 360 / participants.length;
+            // Centre le pointeur au milieu du segment gagnant
+            const targetAngle = (winnerIndex * anglePerSegment) + (anglePerSegment / 2);
+            // Angle de rotation final, incluant plusieurs tours
+            const finalRotation = (360 * totalSpins) + targetAngle - (currentRotation % 360);
+
+            tickSound.play();
+
+            gsap.to(wheelDiv, {
+                rotation: `+=${finalRotation}`,
+                duration: spinDuration,
+                ease: "power3.out",
+                onUpdate: () => {
+                    // Pourrait être utilisé pour ajuster le son, etc.
+                },
+                onComplete: () => {
+                    tickSound.stop();
+                    currentRotation += finalRotation;
+                    isSpinning = false;
+                    announceWinner(winner);
+                }
+            });
+        });
+
+        // --- ANNONCE DU GAGNANT ---
+        function announceWinner(winnerName) {
+            console.log("Le gagnant est :", winnerName);
+
+            // Jouer les confettis
+            confettiAnimation.goToAndPlay(0);
+            document.getElementById('confetti-animation').style.display = 'block';
+
+            // Réactiver le bouton après un délai pour permettre de relancer
+            setTimeout(() => {
+                document.getElementById('confetti-animation').style.display = 'none';
+                spinButton.disabled = false;
+                alert(`Félicitations à ${winnerName} !`);
+            }, 4000); // 4 secondes
+        }
+
+        // --- Initialisation ---
+        createWheel();
+
+    </script>
+</body>
+</html>
