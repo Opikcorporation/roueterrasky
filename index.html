@@ -10,7 +10,6 @@
         .wheel{width:100%;aspect-ratio:1/1;border-radius:50%;position:relative;overflow:hidden;border:12px solid transparent;background:linear-gradient(#1d1d1f,#1d1d1f) padding-box,linear-gradient(45deg,#b8860b,#ffd700,#daa520) border-box;box-shadow:0 0 25px rgba(255,215,0,.4),inset 0 0 10px rgba(0,0,0,.5);z-index:2}
         .wheel-center{position:absolute;width:28%;height:28%;background-color:#fff;border-radius:50%;z-index:5;box-shadow:0 0 15px rgba(0,0,0,.5);background-image:url(icon.png);background-size:85%;background-position:center;background-repeat:no-repeat}
         
-        /* --- STYLE CURSEUR NOIR --- */
         .ticker {
             position: absolute;
             top: -5%;
@@ -20,7 +19,7 @@
             height: 0;
             border-left: 25px solid transparent;
             border-right: 25px solid transparent;
-            border-top: 40px solid #000000; /* Couleur noire */
+            border-top: 40px solid #000000;
             z-index: 10;
             filter: drop-shadow(0px 4px 3px rgba(0,0,0,0.5));
         }
@@ -86,7 +85,11 @@
 
         const wheelDiv = document.getElementById('wheel');
         const spinButton = document.getElementById('spin-button');
-        const confettiDiv1 = document.getElementById('confetti-animation-1'), confettiDiv2 = document.getElementById('confetti-animation-2'), confettiDiv3 = document.getElementById('confetti-animation-3'), confettiDiv4 = document.getElementById('confetti-animation-4');
+        const confettiDiv1 = document.getElementById('confetti-animation-1');
+        const confettiDiv2 = document.getElementById('confetti-animation-2');
+        const confettiDiv3 = document.getElementById('confetti-animation-3');
+        // --- CORRECTION DE LA FAUTE DE FRAPPE ---
+        const confettiDiv4 = document.getElementById('confetti-animation-4');
         const winnerPopup = document.getElementById('winner-popup');
         const winnerNameDisplay = document.getElementById('winner-name-display');
 
@@ -143,9 +146,13 @@
             const svgNS = "http://www.w3.org/2000/svg";
             const svg = document.createElementNS(svgNS, "svg");
             svg.setAttribute("viewBox", "0 0 500 500");
+            const defs = document.createElementNS(svgNS, 'defs');
+            svg.appendChild(defs);
             
             participants.forEach((name, i) => {
-                const startAngle = i * anglePerSegment, endAngle = startAngle + anglePerSegment;
+                const startAngle = i * anglePerSegment;
+                const endAngle = startAngle + anglePerSegment;
+                
                 const path = document.createElementNS(svgNS, "path");
                 const x1 = 250 + 250 * Math.cos(Math.PI * startAngle / 180), y1 = 250 + 250 * Math.sin(Math.PI * startAngle / 180);
                 const x2 = 250 + 250 * Math.cos(Math.PI * endAngle / 180), y2 = 250 + 250 * Math.sin(Math.PI * endAngle / 180);
@@ -153,15 +160,24 @@
                 path.setAttribute("fill", segmentColors[i % segmentColors.length]);
                 svg.appendChild(path);
                 
-                // --- TEXTE CORRIGÉ ---
-                const textAngle = startAngle + anglePerSegment / 2;
-                const text = document.createElementNS(svgNS, "text");
-                text.setAttribute("x", "250");
-                text.setAttribute("y", "250");
-                text.setAttribute("class", "segment-text");
-                // Rotation complète : rotate(angle, centreX, centreY) translate(distance) rotate(pour redresser)
-                text.setAttribute("transform", `rotate(${textAngle}, 250, 250) translate(150, 0) rotate(90, 0, 0)`);
-                text.textContent = name.length > 12 ? name.substring(0, 10) + '...' : name;
+                // --- MÉTHODE TEXTPATH FIABILISÉE ---
+                const textPath = document.createElementNS(svgNS, 'path');
+                const pathId = `textpath-${i}`;
+                textPath.setAttribute('id', pathId);
+                const midAngle = startAngle + anglePerSegment / 2;
+                // Calcule le chemin pour le texte (une ligne droite partant du centre)
+                const textX = 250 + 240 * Math.cos(Math.PI * midAngle / 180);
+                const textY = 250 + 240 * Math.sin(Math.PI * midAngle / 180);
+                // Le chemin va du centre (un peu décalé) vers le bord
+                textPath.setAttribute('d', `M 260,250 L ${textX},${textY}`);
+                defs.appendChild(textPath);
+
+                const text = document.createElementNS(svgNS, 'text');
+                const textPathEl = document.createElementNS(svgNS, 'textPath');
+                textPathEl.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `#${pathId}`);
+                textPathEl.setAttribute('class', 'segment-text');
+                textPathEl.textContent = name.length > 12 ? name.substring(0, 10) + '...' : name;
+                text.appendChild(textPathEl);
                 svg.appendChild(text);
             });
             
