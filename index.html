@@ -6,7 +6,7 @@
     <title>Roue de la Chance</title>
     <style>
         /* --- Styles Généraux --- */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Montserrat:wght@800&display=swap');
 
         body {
             margin: 0;
@@ -55,7 +55,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
+            gap: 20px; /* Réduit pour accommoder le titre */
+        }
+        
+        /* --- NOUVEAU : Style pour l'image de titre --- */
+        .title-image {
+            max-width: 450px; /* Ajustez la taille selon votre image */
+            margin-bottom: 10px;
         }
 
         /* --- Conteneur de la Roue --- */
@@ -79,7 +85,6 @@
             z-index: 2;
         }
 
-        /* --- NOUVEAU : Centre de la roue avec logo --- */
         .wheel-center {
             position: absolute;
             width: 140px;
@@ -97,7 +102,6 @@
             background-repeat: no-repeat;
         }
 
-        /* --- Pointeur --- */
         .ticker {
             position: absolute;
             top: -20px;
@@ -112,7 +116,6 @@
             filter: drop-shadow(0px 5px 3px rgba(0,0,0,0.4));
         }
 
-        /* --- Segments et Texte de la Roue --- */
         .wheel svg {
             width: 100%;
             height: 100%;
@@ -153,6 +156,63 @@
             transform: scale(1);
             box-shadow: none;
         }
+
+        /* --- NOUVEAU : Popup du gagnant --- */
+        .winner-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            display: none; /* Caché par défaut */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .winner-popup .winner-name {
+            font-size: 80px;
+            font-weight: 800;
+            /* Le style "Or 3D" est ici */
+            color: #FFD700;
+            text-shadow: 
+                0px 1px 0px #c8a900,
+                0px 2px 0px #c0a000,
+                0px 3px 0px #b89700,
+                0px 4px 0px #b08e00,
+                0px 5px 0px #a88500,
+                0px 6px 1px rgba(0,0,0,0.1),
+                0px 0px 5px rgba(0,0,0,0.1),
+                0px 1px 3px rgba(0,0,0,0.3),
+                0px 3px 5px rgba(0,0,0,0.2),
+                0px 5px 10px rgba(0,0,0,0.25),
+                0px 10px 10px rgba(0,0,0,0.2),
+                0px 20px 20px rgba(0,0,0,0.15);
+        }
+
+        .winner-popup .prize-text {
+            font-size: 40px;
+            color: #fff;
+            margin-top: -10px;
+            text-shadow: 0 0 10px #000, 0 0 20px #000;
+        }
+        
+        .winner-popup .next-spin-button {
+            margin-top: 40px;
+            padding: 12px 30px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #4a148c;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -160,8 +220,11 @@
     <div id="bg-animation"></div>
     <div id="confetti-animation-1" class="confetti-container"></div>
     <div id="confetti-animation-2" class="confetti-container"></div>
+    <div id="confetti-animation-3" class="confetti-container"></div>
 
     <div class="main-container">
+        <img src="Win1000AED.png" alt="Titre du jeu" class="title-image">
+        
         <div class="wheel-container">
             <div class="ticker"></div>
             <div class="wheel-center"></div>
@@ -169,6 +232,14 @@
             <div class="wheel" id="wheel"></div>
         </div>
         <button id="spin-button">Lancer la Roue</button>
+    </div>
+
+    <div id="winner-popup" class="winner-popup">
+        <div class="winner-content">
+            <div id="winner-name-display" class="winner-name"></div>
+            <div class="prize-text">YOU WIN 1000 AED !</div>
+            <button id="next-spin-button" class="next-spin-button">Tour suivant</button>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
@@ -182,6 +253,9 @@
             'Grace', 'Heidi', 'Ivan', 'Judy', 'Kevin', 'Liam'
         ];
         
+        // MODIFIÉ : Liste des gagnants prédéfinis dans l'ordre
+        const predefinedWinners = ['David', 'Judy', 'Alice', 'Frank']; 
+        
         const segmentColors = ["#6A1B9A", "#8E24AA", "#AB47BC", "#BA68C8"];
         const spinDuration = 8;
         const totalSpins = 6;
@@ -191,29 +265,29 @@
         const spinButton = document.getElementById('spin-button');
         const confettiDiv1 = document.getElementById('confetti-animation-1');
         const confettiDiv2 = document.getElementById('confetti-animation-2');
+        // NOUVEAU : Element DOM pour les confettis supplémentaires et la popup
+        const confettiDiv3 = document.getElementById('confetti-animation-3');
+        const winnerPopup = document.getElementById('winner-popup');
+        const winnerNameDisplay = document.getElementById('winner-name-display');
+        const nextSpinButton = document.getElementById('next-spin-button');
 
         // --- INITIALISATION DES SONS ---
-        const tickSound = new Howl({
-            src: ['sounds/tick.mp3'],
-            loop: true,
-            volume: 0.8
-        });
-        
-        const winSound = new Howl({
-            src: ['sounds/win.mp3'],
-            volume: 0.7
-        });
+        const tickSound = new Howl({ src: ['sounds/tick.mp3'], loop: true, volume: 0.8 });
+        const winSound = new Howl({ src: ['sounds/win.mp3'], volume: 0.7 });
         
         // --- CHARGEMENT DES ANIMATIONS LOTTIE ---
         const bgAnimation = lottie.loadAnimation({ container: document.getElementById('bg-animation'), renderer: 'svg', loop: true, autoplay: true, path: 'fond.json' });
         const glowAnimation = lottie.loadAnimation({ container: document.getElementById('glow-animation'), renderer: 'canvas', loop: true, autoplay: true, path: 'lueur.json', rendererSettings: { assetsPath: 'images/' } });
         const confettiAnimation1 = lottie.loadAnimation({ container: confettiDiv1, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
         const confettiAnimation2 = lottie.loadAnimation({ container: confettiDiv2, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
+        // NOUVEAU : Chargement de la 3ème animation de confettis
+        const confettiAnimation3 = lottie.loadAnimation({ container: confettiDiv3, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
         
         confettiAnimation2.setDirection(-1);
 
         // --- CREATION DE LA ROUE ---
         function createWheel() {
+            // (Le code de création de la roue est identique et reste ici)
             const numSegments = participants.length;
             const anglePerSegment = 360 / numSegments;
             const svgNS = "http://www.w3.org/2000/svg";
@@ -244,59 +318,89 @@
             wheelDiv.appendChild(svg);
         }
 
-        // --- LOGIQUE DU LANCÉ (CORRIGÉE) ---
+        // --- LOGIQUE DU LANCÉ (MODIFIÉE pour les gagnants prédéfinis) ---
         let isSpinning = false;
-        let spinCount = 0; // On va compter le nombre de lancers
+        let currentWinnerIndex = 0; // Index pour suivre le gagnant actuel dans la liste
 
         spinButton.addEventListener('click', () => {
-            if (isSpinning) return;
+            if (isSpinning || currentWinnerIndex >= predefinedWinners.length) return;
+            
             isSpinning = true;
             spinButton.disabled = true;
             
-            // On incrémente le compteur de lancers
-            spinCount++;
+            const winnerName = predefinedWinners[currentWinnerIndex];
+            const winnerIndexOnWheel = participants.indexOf(winnerName);
 
-            const winnerIndex = Math.floor(Math.random() * participants.length);
-            const winner = participants[winnerIndex];
+            if (winnerIndexOnWheel === -1) {
+                alert(`Erreur : Le gagnant prédéfini "${winnerName}" n'est pas dans la liste des participants.`);
+                isSpinning = false;
+                spinButton.disabled = false;
+                return;
+            }
 
-            // Calcul de l'angle de base pour le gagnant
             const anglePerSegment = 360 / participants.length;
-            const targetAngle = 360 - ((winnerIndex * anglePerSegment) + (anglePerSegment / 2));
-
-            // NOUVEAU CALCUL : On définit une rotation absolue toujours plus grande
-            const finalRotation = (360 * totalSpins * spinCount) + targetAngle;
+            const targetAngle = 360 - ((winnerIndexOnWheel * anglePerSegment) + (anglePerSegment / 2));
+            const finalRotation = (360 * totalSpins * (currentWinnerIndex + 1)) + targetAngle;
             
             tickSound.play();
 
             gsap.to(wheelDiv, {
-                rotation: finalRotation, // On utilise la rotation absolue
+                rotation: finalRotation,
                 duration: spinDuration,
-                ease: "power4.out", // J'ai un peu ajusté l'effet de ralentissement
+                ease: "power4.out",
                 onComplete: () => {
                     tickSound.stop();
                     isSpinning = false;
-                    announceWinner(winner);
+                    announceWinner(winnerName);
                 }
             });
         });
 
-        // --- ANNONCE DU GAGNANT ---
+        // --- ANNONCE DU GAGNANT (MODIFIÉE pour afficher la popup) ---
         function announceWinner(winnerName) {
             console.log("Le gagnant est :", winnerName);
             winSound.play();
+
+            // Afficher le nom dans la popup
+            winnerNameDisplay.textContent = winnerName;
+            winnerPopup.style.display = 'flex';
+
+            // Lancer toutes les animations de confettis
             confettiDiv1.style.display = 'block';
             confettiAnimation1.goToAndPlay(0);
+            
             setTimeout(() => {
                 confettiDiv2.style.display = 'block';
                 confettiAnimation2.goToAndPlay(0);
             }, 300);
+
             setTimeout(() => {
-                confettiDiv1.style.display = 'none';
-                confettiDiv2.style.display = 'none';
-                spinButton.disabled = false;
-                alert(`Félicitations à ${winnerName} !`);
-            }, 4000);
+                confettiDiv3.style.display = 'block';
+                confettiAnimation3.goToAndPlay(0);
+            }, 600); // Léger décalage pour le 3ème effet
         }
+
+        // NOUVEAU : Gérer la fermeture de la popup et le prochain tour
+        nextSpinButton.addEventListener('click', () => {
+            winnerPopup.style.display = 'none';
+
+            // Cacher les confettis
+            confettiDiv1.style.display = 'none';
+            confettiDiv2.style.display = 'none';
+            confettiDiv3.style.display = 'none';
+            
+            // Passer au gagnant suivant
+            currentWinnerIndex++;
+
+            // Réactiver le bouton s'il reste des gagnants à tirer
+            if (currentWinnerIndex < predefinedWinners.length) {
+                spinButton.disabled = false;
+            } else {
+                spinButton.textContent = "Jeu Terminé";
+                spinButton.disabled = true;
+            }
+        });
+
 
         // --- Initialisation ---
         createWheel();
