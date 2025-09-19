@@ -8,8 +8,9 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Montserrat:wght@800&display=swap');
 
         :root {
-            --wheel-size: 500px;
-            --title-size: 450px;
+            /* --- TAILLES RÉDUITES POUR QUE TOUT S'AFFICHE --- */
+            --wheel-size: 450px;
+            --title-size: 380px;
         }
 
         body {
@@ -21,10 +22,10 @@
             color: white;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* On recentre verticalement */
+            justify-content: center;
             align-items: center;
-            height: 100vh; /* Hauteur fixe, pas de min-height */
-            overflow: hidden; /* ON SUPPRIME LE SCROLL, tout doit tenir */
+            height: 100vh;
+            overflow: hidden; /* Garantit qu'il n'y a jamais de scroll */
         }
 
         #bg-animation {
@@ -49,7 +50,8 @@
 
         .main-container {
             display: flex; flex-direction: column;
-            align-items: center; gap: 20px;
+            align-items: center;
+            gap: 15px; /* Espace légèrement réduit */
             width: 100%;
         }
         
@@ -57,12 +59,11 @@
             width: var(--title-size);
             max-width: 90%;
             height: auto;
-            transition: all 0.3s ease; /* Pour un déplacement fluide */
         }
 
         .wheel-container {
             position: relative; width: var(--wheel-size); height: var(--wheel-size);
-            max-width: 95vw; max-height: 80vh; /* Limite la hauteur max de la roue */
+            max-width: 95vw; max-height: 80vh;
             display: flex; justify-content: center; align-items: center;
         }
         
@@ -130,36 +131,33 @@
             text-shadow: 0 0 10px #000, 0 0 20px #000;
         }
         
-        /* --- MEDIA QUERIES --- */
-        @media (max-width: 768px) {
-            :root {
-                --wheel-size: 400px;
-                --title-size: 350px;
+        /* Media query pour les écrans encore plus grands si besoin */
+        @media (min-height: 850px) {
+             :root {
+                --wheel-size: 500px;
+                --title-size: 450px;
             }
-            #spin-button { font-size: 20px; padding: 12px 35px; }
         }
-        
-        /* --- NOUVEAU : Réorganisation pour les écrans à faible hauteur --- */
+
+        /* Réorganisation pour les écrans à faible hauteur */
         @media (max-height: 700px) and (orientation: landscape), (max-width: 400px) {
             body {
-                justify-content: center; /* On recentre juste la roue et le bouton */
+                justify-content: center;
             }
 
             .title-image {
-                position: absolute; /* On sort le logo du flux normal */
-                top: 15px;
-                left: 15px;
-                width: 180px; /* On le rend plus petit */
+                position: absolute;
+                top: 15px; left: 15px;
+                width: 180px;
                 z-index: 20;
             }
 
             .main-container {
-                padding-top: 0; /* Plus besoin de marge en haut car le titre n'est plus là */
+                padding-top: 0;
                 gap: 15px;
             }
 
             :root {
-                /* La roue prend un % de la hauteur pour s'adapter parfaitement */
                 --wheel-size: 60vh; 
             }
             
@@ -199,7 +197,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
 
     <script>
-        // Le JavaScript n'a pas besoin d'être modifié.
+        // Le JavaScript reste identique
         const participants = ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Frank', 'Grace', 'Heidi', 'Ivan', 'Judy', 'Kevin', 'Liam'];
         const predefinedWinners = ['David', 'Judy', 'Alice', 'Frank']; 
         const segmentColors = ["#6A1B9A", "#8E24AA", "#AB47BC", "#BA68C8"];
