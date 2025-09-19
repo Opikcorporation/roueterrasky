@@ -8,9 +8,16 @@
         /* --- Styles Généraux --- */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Montserrat:wght@800&display=swap');
 
+        :root {
+            /* Variables pour un contrôle facile de la taille */
+            --wheel-size: 500px;
+            --title-size: 450px;
+        }
+
         body {
             margin: 0;
-            padding: 0;
+            padding: 20px;
+            box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
             background-color: #1a023b;
             overflow: hidden;
@@ -38,10 +45,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 100;
             pointer-events: none;
             display: none;
         }
+        
+        /* Z-index élevés pour que les confettis soient par-dessus tout */
+        #confetti-animation-1 { z-index: 301; }
+        #confetti-animation-2 { z-index: 302; }
+        #confetti-animation-3 { z-index: 303; }
         
         #glow-animation {
             position: absolute;
@@ -55,28 +66,32 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px; /* Réduit pour accommoder le titre */
+            gap: 20px;
+            width: 100%;
         }
         
-        /* --- NOUVEAU : Style pour l'image de titre --- */
+        /* --- Titre (Responsive) --- */
         .title-image {
-            max-width: 450px; /* Ajustez la taille selon votre image */
-            margin-bottom: 10px;
+            width: var(--title-size);
+            max-width: 90%; /* Limite pour ne pas dépasser sur les petits écrans */
+            height: auto;
         }
 
-        /* --- Conteneur de la Roue --- */
+        /* --- Conteneur de la Roue (Responsive) --- */
         .wheel-container {
             position: relative;
-            width: 500px;
-            height: 500px;
+            width: var(--wheel-size);
+            height: var(--wheel-size);
+            max-width: 95vw; /* Assure que la roue ne dépasse jamais de l'écran en largeur */
+            max-height: 95vh;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-
+        
         .wheel {
             width: 100%;
-            height: 100%;
+            aspect-ratio: 1 / 1; /* Garde le ratio carré pour que border-radius: 50% fasse un cercle parfait */
             border-radius: 50%;
             position: relative;
             overflow: hidden;
@@ -87,15 +102,12 @@
 
         .wheel-center {
             position: absolute;
-            width: 140px;
-            height: 140px;
+            width: 28%; /* Pourcentage pour s'adapter à la taille de la roue */
+            height: 28%;
             background-color: #fff;
             border-radius: 50%;
             z-index: 5;
             box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
             background-image: url('icon.png');
             background-size: 85%;
             background-position: center;
@@ -104,7 +116,7 @@
 
         .ticker {
             position: absolute;
-            top: -20px;
+            top: -4%; /* Pourcentage pour s'adapter */
             left: 50%;
             transform: translateX(-50%);
             width: 0;
@@ -122,13 +134,12 @@
         }
 
         .wheel .segment-text {
-            font-size: 16px;
+            font-size: clamp(8px, 3vw, 16px); /* Taille de police responsive */
             font-weight: 700;
             fill: #fff;
             text-anchor: middle;
         }
 
-        /* --- Bouton pour Lancer --- */
         #spin-button {
             padding: 15px 40px;
             font-size: 24px;
@@ -139,84 +150,89 @@
             border-radius: 50px;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             transition: all 0.2s ease-in-out;
             z-index: 10;
         }
+        #spin-button:hover { transform: scale(1.05); }
+        #spin-button:disabled { cursor: not-allowed; background: #ccc; transform: scale(1); box-shadow: none; }
 
-        #spin-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.5);
-        }
-        
-        #spin-button:disabled {
-            cursor: not-allowed;
-            background: #ccc;
-            transform: scale(1);
-            box-shadow: none;
-        }
-
-        /* --- NOUVEAU : Popup du gagnant --- */
+        /* --- Popup du gagnant (Responsive et z-index corrigé) --- */
         .winner-popup {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 200;
-            display: none; /* Caché par défaut */
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 200; /* Le fond noir est à 200 */
+            display: none;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
+            cursor: pointer; /* Curseur pour indiquer que c'est cliquable */
+        }
+        
+        .winner-popup .winner-content {
+            position: relative;
+            z-index: 201; /* Le texte est à 201, donc devant le fond noir */
             text-align: center;
-            font-family: 'Montserrat', sans-serif;
         }
 
         .winner-popup .winner-name {
-            font-size: 80px;
+            font-size: clamp(40px, 12vw, 80px); /* Responsive */
             font-weight: 800;
-            /* Le style "Or 3D" est ici */
             color: #FFD700;
+            padding: 0 20px;
             text-shadow: 
-                0px 1px 0px #c8a900,
-                0px 2px 0px #c0a000,
-                0px 3px 0px #b89700,
-                0px 4px 0px #b08e00,
-                0px 5px 0px #a88500,
-                0px 6px 1px rgba(0,0,0,0.1),
-                0px 0px 5px rgba(0,0,0,0.1),
-                0px 1px 3px rgba(0,0,0,0.3),
-                0px 3px 5px rgba(0,0,0,0.2),
-                0px 5px 10px rgba(0,0,0,0.25),
-                0px 10px 10px rgba(0,0,0,0.2),
-                0px 20px 20px rgba(0,0,0,0.15);
+                0px 1px 0px #c8a900, 0px 2px 0px #c0a000, 0px 3px 0px #b89700,
+                0px 4px 0px #b08e00, 0px 5px 0px #a88500, 0px 6px 1px rgba(0,0,0,0.1),
+                0px 0px 5px rgba(0,0,0,0.1), 0px 1px 3px rgba(0,0,0,0.3),
+                0px 3px 5px rgba(0,0,0,0.2), 0px 5px 10px rgba(0,0,0,0.25),
+                0px 10px 10px rgba(0,0,0,0.2), 0px 20px 20px rgba(0,0,0,0.15);
         }
 
         .winner-popup .prize-text {
-            font-size: 40px;
+            font-size: clamp(20px, 6vw, 40px); /* Responsive */
             color: #fff;
             margin-top: -10px;
             text-shadow: 0 0 10px #000, 0 0 20px #000;
         }
         
-        .winner-popup .next-spin-button {
-            margin-top: 40px;
-            padding: 12px 30px;
-            font-size: 20px;
-            font-weight: 700;
-            color: #4a148c;
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            text-transform: uppercase;
+        /* --- MEDIA QUERIES pour le Responsive --- */
+        @media (max-width: 768px) {
+            :root {
+                --wheel-size: 400px;
+                --title-size: 350px;
+            }
+            #spin-button {
+                font-size: 20px;
+                padding: 12px 35px;
+            }
+        }
+        
+        @media (max-width: 500px), (max-height: 500px) and (orientation: landscape) {
+            :root {
+                --wheel-size: 280px;
+                --title-size: 250px;
+            }
+            body {
+                padding: 10px;
+            }
+            .main-container { gap: 15px; }
+            .ticker {
+                border-left-width: 15px;
+                border-right-width: 15px;
+                border-top-width: 25px;
+            }
+            .wheel { border-width: 5px; }
+            #spin-button {
+                font-size: 16px;
+                padding: 10px 25px;
+            }
         }
     </style>
 </head>
 <body>
-
     <div id="bg-animation"></div>
     <div id="confetti-animation-1" class="confetti-container"></div>
     <div id="confetti-animation-2" class="confetti-container"></div>
@@ -238,7 +254,6 @@
         <div class="winner-content">
             <div id="winner-name-display" class="winner-name"></div>
             <div class="prize-text">YOU WIN 1000 AED !</div>
-            <button id="next-spin-button" class="next-spin-button">Tour suivant</button>
         </div>
     </div>
 
@@ -248,14 +263,8 @@
 
     <script>
         // --- CONFIGURATION ---
-        const participants = [
-            'Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Frank', 
-            'Grace', 'Heidi', 'Ivan', 'Judy', 'Kevin', 'Liam'
-        ];
-        
-        // MODIFIÉ : Liste des gagnants prédéfinis dans l'ordre
+        const participants = ['Alice', 'Bob', 'Charlie', 'David', 'Eva', 'Frank', 'Grace', 'Heidi', 'Ivan', 'Judy', 'Kevin', 'Liam'];
         const predefinedWinners = ['David', 'Judy', 'Alice', 'Frank']; 
-        
         const segmentColors = ["#6A1B9A", "#8E24AA", "#AB47BC", "#BA68C8"];
         const spinDuration = 8;
         const totalSpins = 6;
@@ -265,29 +274,24 @@
         const spinButton = document.getElementById('spin-button');
         const confettiDiv1 = document.getElementById('confetti-animation-1');
         const confettiDiv2 = document.getElementById('confetti-animation-2');
-        // NOUVEAU : Element DOM pour les confettis supplémentaires et la popup
         const confettiDiv3 = document.getElementById('confetti-animation-3');
         const winnerPopup = document.getElementById('winner-popup');
         const winnerNameDisplay = document.getElementById('winner-name-display');
-        const nextSpinButton = document.getElementById('next-spin-button');
 
-        // --- INITIALISATION DES SONS ---
+        // --- SONS ---
         const tickSound = new Howl({ src: ['sounds/tick.mp3'], loop: true, volume: 0.8 });
         const winSound = new Howl({ src: ['sounds/win.mp3'], volume: 0.7 });
         
-        // --- CHARGEMENT DES ANIMATIONS LOTTIE ---
+        // --- ANIMATIONS LOTTIE ---
         const bgAnimation = lottie.loadAnimation({ container: document.getElementById('bg-animation'), renderer: 'svg', loop: true, autoplay: true, path: 'fond.json' });
         const glowAnimation = lottie.loadAnimation({ container: document.getElementById('glow-animation'), renderer: 'canvas', loop: true, autoplay: true, path: 'lueur.json', rendererSettings: { assetsPath: 'images/' } });
         const confettiAnimation1 = lottie.loadAnimation({ container: confettiDiv1, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
         const confettiAnimation2 = lottie.loadAnimation({ container: confettiDiv2, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
-        // NOUVEAU : Chargement de la 3ème animation de confettis
         const confettiAnimation3 = lottie.loadAnimation({ container: confettiDiv3, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
-        
         confettiAnimation2.setDirection(-1);
 
         // --- CREATION DE LA ROUE ---
         function createWheel() {
-            // (Le code de création de la roue est identique et reste ici)
             const numSegments = participants.length;
             const anglePerSegment = 360 / numSegments;
             const svgNS = "http://www.w3.org/2000/svg";
@@ -310,40 +314,34 @@
                 text.setAttribute("y", "250");
                 text.setAttribute("dy", "0.35em");
                 text.setAttribute("class", "segment-text");
-                const textTransform = `rotate(${textAngle}, 250, 250) translate(150, 0) rotate(-90, 0, 0)`;
+                const textTransform = `rotate(${textAngle}, 250, 250) translate(150, 0) rotate(90, 0, 0)`;
                 text.setAttribute("transform", textTransform);
                 text.textContent = name;
                 svg.appendChild(text);
             });
+            wheelDiv.innerHTML = '';
             wheelDiv.appendChild(svg);
         }
-
-        // --- LOGIQUE DU LANCÉ (MODIFIÉE pour les gagnants prédéfinis) ---
+        
+        // --- LOGIQUE DU LANCÉ ---
         let isSpinning = false;
-        let currentWinnerIndex = 0; // Index pour suivre le gagnant actuel dans la liste
-
+        let currentWinnerIndex = 0;
         spinButton.addEventListener('click', () => {
             if (isSpinning || currentWinnerIndex >= predefinedWinners.length) return;
-            
             isSpinning = true;
             spinButton.disabled = true;
-            
             const winnerName = predefinedWinners[currentWinnerIndex];
             const winnerIndexOnWheel = participants.indexOf(winnerName);
-
             if (winnerIndexOnWheel === -1) {
-                alert(`Erreur : Le gagnant prédéfini "${winnerName}" n'est pas dans la liste des participants.`);
+                alert(`Erreur : Le gagnant "${winnerName}" n'est pas dans la liste des participants.`);
                 isSpinning = false;
                 spinButton.disabled = false;
                 return;
             }
-
             const anglePerSegment = 360 / participants.length;
             const targetAngle = 360 - ((winnerIndexOnWheel * anglePerSegment) + (anglePerSegment / 2));
             const finalRotation = (360 * totalSpins * (currentWinnerIndex + 1)) + targetAngle;
-            
             tickSound.play();
-
             gsap.to(wheelDiv, {
                 rotation: finalRotation,
                 duration: spinDuration,
@@ -356,43 +354,30 @@
             });
         });
 
-        // --- ANNONCE DU GAGNANT (MODIFIÉE pour afficher la popup) ---
+        // --- ANNONCE DU GAGNANT ---
         function announceWinner(winnerName) {
-            console.log("Le gagnant est :", winnerName);
             winSound.play();
-
-            // Afficher le nom dans la popup
             winnerNameDisplay.textContent = winnerName;
             winnerPopup.style.display = 'flex';
-
-            // Lancer toutes les animations de confettis
             confettiDiv1.style.display = 'block';
             confettiAnimation1.goToAndPlay(0);
-            
             setTimeout(() => {
                 confettiDiv2.style.display = 'block';
                 confettiAnimation2.goToAndPlay(0);
             }, 300);
-
             setTimeout(() => {
                 confettiDiv3.style.display = 'block';
                 confettiAnimation3.goToAndPlay(0);
-            }, 600); // Léger décalage pour le 3ème effet
+            }, 600);
         }
 
-        // NOUVEAU : Gérer la fermeture de la popup et le prochain tour
-        nextSpinButton.addEventListener('click', () => {
+        // --- GESTION DE LA POPUP DU GAGNANT ---
+        winnerPopup.addEventListener('click', () => {
             winnerPopup.style.display = 'none';
-
-            // Cacher les confettis
             confettiDiv1.style.display = 'none';
             confettiDiv2.style.display = 'none';
             confettiDiv3.style.display = 'none';
-            
-            // Passer au gagnant suivant
             currentWinnerIndex++;
-
-            // Réactiver le bouton s'il reste des gagnants à tirer
             if (currentWinnerIndex < predefinedWinners.length) {
                 spinButton.disabled = false;
             } else {
@@ -400,7 +385,6 @@
                 spinButton.disabled = true;
             }
         });
-
 
         // --- Initialisation ---
         createWheel();
