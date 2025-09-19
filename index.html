@@ -177,7 +177,7 @@
 
         // --- INITIALISATION DU SON ---
         const tickSound = new Howl({
-            src: ['https://cdn.freesound.org/previews/51/51624_10043-lq.mp3'],
+            src: ['https://assets.codepen.io/605876/tick.mp3'], // <-- LIEN DU SON CORRIGÉ
             loop: true,
             volume: 0.6
         });
@@ -193,10 +193,13 @@
 
         const glowAnimation = lottie.loadAnimation({
             container: document.getElementById('glow-animation'),
-            renderer: 'canvas', // MODIFIÉ ICI
+            renderer: 'canvas',
             loop: true,
             autoplay: true,
-            path: 'lueur.json'
+            path: 'lueur.json',
+            rendererSettings: {
+                assetsPath: 'images/' // <-- CHEMIN DE L'IMAGE AJOUTÉ
+            }
         });
 
         const confettiAnimation = lottie.loadAnimation({
