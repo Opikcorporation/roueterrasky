@@ -193,7 +193,7 @@
 
         const glowAnimation = lottie.loadAnimation({
             container: document.getElementById('glow-animation'),
-            renderer: 'svg',
+            renderer: 'canvas', // MODIFIÉ ICI
             loop: true,
             autoplay: true,
             path: 'lueur.json'
