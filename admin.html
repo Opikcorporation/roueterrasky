@@ -16,6 +16,11 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 30px;
+            /* --- NOUVELLE MISE EN PAGE FLEXBOX --- */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
 
         h1 {
@@ -24,6 +29,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin: 0 0 40px 0;
+            flex-shrink: 0; /* Empêche le titre de rétrécir */
         }
 
         .dashboard-grid {
@@ -31,7 +37,8 @@
             grid-template-columns: 1fr 1fr;
             grid-template-rows: auto 1fr;
             gap: 30px;
-            height: calc(100vh - 140px);
+            flex-grow: 1; /* Permet à la grille de prendre tout l'espace vertical disponible */
+            min-height: 0; /* Correction pour le flexbox dans certains navigateurs */
         }
 
         .card {
@@ -50,6 +57,7 @@
             grid-column: 1 / 2;
             display: flex;
             flex-direction: column;
+            min-height: 0;
         }
         
         .winners-card {
@@ -66,6 +74,10 @@
             justify-content: space-between;
             align-items: center;
         }
+        .card h2 .button-group {
+            display: flex;
+            gap: 10px;
+        }
 
         #create-session-btn {
             padding: 14px 28px;
@@ -80,18 +92,16 @@
         }
         #create-session-btn:hover { background-color: #333333; }
 
-        /* --- MISE EN PAGE DES LIENS CORRIGÉE --- */
         #session-links {
             margin-top: 20px;
-            display: none; /* Caché par défaut, affiché via JS */
-            display: grid;
-            grid-template-columns: 1fr auto; /* Colonne flexible pour l'input, colonne fixe pour le bouton */
+            display: none;
+            grid-template-columns: 1fr auto;
             row-gap: 15px;
             column-gap: 10px;
             align-items: center;
         }
         #session-links label {
-            grid-column: 1 / -1; /* Le label prend toute la largeur */
+            grid-column: 1 / -1;
             margin-bottom: -5px;
             font-weight: normal;
             color: #86868b;
@@ -119,7 +129,7 @@
         }
         #session-links button:hover { background-color: #f0f0f0; }
 
-        #download-btn {
+        .action-btn {
             padding: 8px 16px;
             font-size: 14px;
             font-weight: 600;
@@ -130,7 +140,7 @@
             cursor: pointer;
             transition: background-color 0.2s ease;
         }
-        #download-btn:hover { background-color: #d8eaff; }
+        .action-btn:hover { background-color: #d8eaff; }
 
         #participant-list {
             list-style: none;
@@ -160,15 +170,33 @@
             margin-bottom: 15px;
             font-size: 18px;
         }
-        .winner-slot .label {
-            color: #86868b;
-            font-size: 14px;
-            margin-right: 10px;
+        .winner-slot .label { color: #86868b; font-size: 14px; margin-right: 10px; }
+        .winner-slot.filled { background-color: #e5f2ff; border-color: #007aff; font-weight: 600; }
+        
+        #import-section {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e8e8e8;
         }
-        .winner-slot.filled {
-            background-color: #e5f2ff;
-            border-color: #007aff;
-            font-weight: 600;
+        #import-section textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            border: 1px solid #d2d2d7;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+        
+        /* --- STYLE POUR LE FOOTER --- */
+        .footer {
+            text-align: center;
+            padding-top: 30px;
+            font-size: 12px;
+            color: #86868b;
+            flex-shrink: 0; /* Empêche le footer de rétrécir */
         }
     </style>
 </head>
@@ -176,17 +204,14 @@
 
     <div class="container">
         <h1>TABLEAU DE BORD ADMINISTRATEUR</h1>
-
         <div class="dashboard-grid">
             <div class="card session-card">
                 <h2>Session de Jeu</h2>
                 <button id="create-session-btn">Créer une nouvelle session</button>
-                <!-- STRUCTURE HTML CORRIGÉE -->
                 <div id="session-links">
                     <label for="inscription-link">Lien d'inscription</label>
                     <input type="text" id="inscription-link" readonly>
                     <button class="copy-btn" data-target="inscription-link">Copier</button>
-                    
                     <label for="wheel-link">Lien de la roue</label>
                     <input type="text" id="wheel-link" readonly>
                     <button class="copy-btn" data-target="wheel-link">Copier</button>
@@ -196,11 +221,16 @@
             <div class="card participants-card">
                 <h2>
                     <span>Participants (<span id="participant-count">0</span>)</span>
-                    <button id="download-btn">Télécharger (CSV)</button>
+                    <div class="button-group">
+                        <button id="import-btn" class="action-btn">Importer</button>
+                        <button id="download-btn" class="action-btn">Télécharger</button>
+                    </div>
                 </h2>
-                <ul id="participant-list">
-                    <!-- Les participants apparaîtront ici -->
-                </ul>
+                <div id="import-section">
+                    <textarea id="participant-import-text" placeholder="Collez votre liste de pseudos ici (un par ligne)"></textarea>
+                    <button id="add-list-btn" class="action-btn" style="width: 100%;">Ajouter à la liste</button>
+                </div>
+                <ul id="participant-list"></ul>
             </div>
 
             <div class="card winners-card">
@@ -211,12 +241,15 @@
                 <div class="winner-slot" id="winner-slot-3"><span class="label">4ème Gagnant :</span><span class="name"></span></div>
             </div>
         </div>
+        
+        <div class="footer">
+            Designed and Developed by Osmaweb, a subsidiary of Opik Corporation – Alessio Opik
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+        import { getFirestore, doc, setDoc, onSnapshot, collection, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
             authDomain: "roue-de-la-chance-c0f6a.firebaseapp.com",
@@ -225,12 +258,10 @@
             messagingSenderId: "491916732335",
             appId: "1:491916732335:web:7a9765b2720d995583315a"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
         window.db = db;
-        window.firestoreFunctions = { doc, setDoc, onSnapshot, collection };
+        window.firestoreFunctions = { doc, setDoc, onSnapshot, collection, writeBatch };
     </script>
 
     <script>
@@ -242,55 +273,50 @@
         const participantCountSpan = document.getElementById('participant-count');
         const copyBtns = document.querySelectorAll('.copy-btn');
         const winnerSlotsUI = [
-            document.querySelector('#winner-slot-0 .name'),
-            document.querySelector('#winner-slot-1 .name'),
-            document.querySelector('#winner-slot-2 .name'),
-            document.querySelector('#winner-slot-3 .name')
+            document.querySelector('#winner-slot-0 .name'), document.querySelector('#winner-slot-1 .name'),
+            document.querySelector('#winner-slot-2 .name'), document.querySelector('#winner-slot-3 .name')
         ];
         const downloadBtn = document.getElementById('download-btn');
-        
+        const importBtn = document.getElementById('import-btn');
+        const importSection = document.getElementById('import-section');
+        const importTextArea = document.getElementById('participant-import-text');
+        const addListBtn = document.getElementById('add-list-btn');
+
         let participants = [];
         let winnerSlots = [null, null, null, null];
         let currentSessionId = null;
-        let unsubscribe = null; // Pour arrêter d'écouter les anciennes sessions
+        let unsubscribe = null;
 
         createSessionBtn.addEventListener('click', () => {
             currentSessionId = `session-${Date.now().toString(36)}`;
             const baseUrl = 'https://opikorporation.github.io/touteterrasky/';
-            
             inscriptionLinkInput.value = `${baseUrl}formulaire.html?session=${currentSessionId}`;
             wheelLinkInput.value = `${baseUrl}?session=${currentSessionId}`;
-            
             sessionLinksDiv.style.display = 'grid';
             createSessionBtn.disabled = true;
             createSessionBtn.textContent = 'Session Créée !';
-
             listenForParticipants(currentSessionId);
         });
 
         copyBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetInput = document.getElementById(btn.dataset.target);
-                targetInput.select();
-                document.execCommand('copy');
+                targetInput.select(); document.execCommand('copy');
                 btn.textContent = 'Copié !';
                 setTimeout(() => { btn.textContent = 'Copier'; }, 2000);
             });
         });
 
         function listenForParticipants(sessionId) {
-            if (unsubscribe) unsubscribe(); // Arrête l'écoute précédente
-            
+            if (unsubscribe) unsubscribe();
             const { db, firestoreFunctions } = window;
             const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
-
             unsubscribe = firestoreFunctions.onSnapshot(participantsRef, (snapshot) => {
                 participants = [];
                 participantList.innerHTML = '';
                 snapshot.forEach(doc => {
                     const participantData = doc.data();
                     participants.push(participantData);
-                    
                     const li = document.createElement('li');
                     li.textContent = participantData.pseudo;
                     li.dataset.pseudo = participantData.pseudo;
@@ -305,7 +331,6 @@
             if (event.target && event.target.tagName === 'LI') {
                 const selectedPseudo = event.target.dataset.pseudo;
                 const isAlreadyWinner = winnerSlots.includes(selectedPseudo);
-
                 if (isAlreadyWinner) {
                     const winnerIndex = winnerSlots.indexOf(selectedPseudo);
                     winnerSlots[winnerIndex] = null;
@@ -313,15 +338,10 @@
                     const emptySlotIndex = winnerSlots.indexOf(null);
                     if (emptySlotIndex !== -1) {
                         winnerSlots[emptySlotIndex] = selectedPseudo;
-                    } else {
-                        alert("Toutes les places de gagnant sont déjà sélectionnées.");
-                        return;
-                    }
+                    } else { alert("Toutes les places de gagnant sont déjà sélectionnées."); return; }
                 }
                 updateWinnerSlotsUI();
                 updateSelectedState();
-                
-                // Sauvegarder les gagnants dans Firestore
                 const { db, firestoreFunctions } = window;
                 const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
                 await firestoreFunctions.setDoc(sessionDocRef, { winners: winnerSlots }, { merge: true });
@@ -330,55 +350,61 @@
         
         function updateWinnerSlotsUI() {
             winnerSlots.forEach((pseudo, index) => {
-                const slotElement = document.getElementById(`winner-slot-${index}`);
-                const nameElement = winnerSlotsUI[index];
-                if (pseudo) {
-                    nameElement.textContent = pseudo;
-                    slotElement.classList.add('filled');
-                } else {
-                    nameElement.textContent = '';
-                    slotElement.classList.remove('filled');
-                }
+                const slotElement = document.getElementById(`winner-slot-${index}`), nameElement = winnerSlotsUI[index];
+                if (pseudo) { nameElement.textContent = pseudo; slotElement.classList.add('filled'); }
+                else { nameElement.textContent = ''; slotElement.classList.remove('filled'); }
             });
         }
 
         function updateSelectedState() {
             const listItems = participantList.querySelectorAll('li');
             listItems.forEach(li => {
-                if (winnerSlots.includes(li.dataset.pseudo)) {
-                    li.classList.add('selected');
-                } else {
-                    li.classList.remove('selected');
-                }
+                if (winnerSlots.includes(li.dataset.pseudo)) li.classList.add('selected');
+                else li.classList.remove('selected');
             });
         }
         
         downloadBtn.addEventListener('click', () => {
-            if (participants.length === 0) {
-                alert("Il n'y a aucun participant à télécharger.");
-                return;
-            }
-            if (!currentSessionId) {
-                alert("Veuillez d'abord créer une session.");
-                return;
-            }
-
+            if (participants.length === 0) { alert("Il n'y a aucun participant à télécharger."); return; }
+            if (!currentSessionId) { alert("Veuillez d'abord créer une session."); return; }
             const headers = ['FullName', 'Pseudo', 'WhatsApp'];
-            const rows = participants.map(p => 
-                [p.fullname, p.pseudo, p.whatsapp].map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')
-            );
-            
+            const rows = participants.map(p => [p.fullname, p.pseudo, p.whatsapp].map(value => `"${String(value).replace(/"/g, '""')}"`).join(','));
             let csvContent = headers.join(',') + '\r\n' + rows.join('\r\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
             link.setAttribute("download", `participants_${currentSessionId}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.style.visibility = 'hidden'; document.body.appendChild(link);
+            link.click(); document.body.removeChild(link);
+        });
+
+        importBtn.addEventListener('click', () => {
+            importSection.style.display = importSection.style.display === 'none' ? 'block' : 'none';
+        });
+
+        addListBtn.addEventListener('click', async () => {
+            if (!currentSessionId) { alert("Veuillez d'abord créer une session."); return; }
+            const names = importTextArea.value.split('\n').map(name => name.trim()).filter(name => name);
+            if (names.length === 0) { alert("Le champ est vide."); return; }
+
+            const { db, firestoreFunctions } = window;
+            const batch = firestoreFunctions.writeBatch(db);
+            names.forEach(name => {
+                const participantRef = firestoreFunctions.doc(firestoreFunctions.collection(db, "sessions", currentSessionId, "participants"));
+                batch.set(participantRef, {
+                    fullname: name,
+                    pseudo: name,
+                    whatsapp: 'N/A',
+                    pseudo_lowercase: name.toLowerCase(),
+                    timestamp: new Date()
+                });
+            });
+
+            await batch.commit();
+            alert(`${names.length} participants ajoutés avec succès !`);
+            importTextArea.value = '';
+            importSection.style.display = 'none';
         });
 
     </script>
