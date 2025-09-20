@@ -1,110 +1,231 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inscription au Jeu</title>
+    <title>Game Registration</title>
     <style>
-        body{margin:0;padding:20px;box-sizing:border-box;font-family:"Avenir Book","Avenir",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";background-color:#f5f5f7;color:#1d1d1f;display:flex;justify-content:center;align-items:center;min-height:100vh}.form-container{background-color:#fff;border:1px solid #d2d2d7;box-shadow:0 8px 32px rgba(0,0,0,.08);padding:40px 50px;border-radius:18px;width:100%;max-width:400px;text-align:center}.form-container h1{font-size:28px;font-weight:900;text-transform:uppercase;margin-top:0;margin-bottom:35px;letter-spacing:1px}.input-group{margin-bottom:20px;text-align:left}.input-group label{display:block;margin-bottom:8px;font-weight:400;color:#86868b;font-size:14px}.input-group input{width:100%;padding:12px 15px;background-color:#f5f5f7;border:1px solid #d2d2d7;border-radius:10px;color:#1d1d1f;font-size:16px;box-sizing:border-box;transition:border-color .2s ease,box-shadow .2s ease;font-family:inherit}.input-group input:focus{outline:0;border-color:#007aff;box-shadow:0 0 0 3px rgba(0,122,255,.2)}.submit-button{width:100%;padding:14px;font-size:17px;font-weight:600;color:#fff;background-color:#000;border:none;border-radius:10px;cursor:pointer;transition:background-color .2s ease-in-out;margin-top:15px}.submit-button:hover{background-color:#333}.submit-button:disabled{background-color:#d2d2d7;cursor:not-allowed}.message{margin-top:20px;font-weight:400;font-size:14px;min-height:20px}.message.success{color:#2e7d32}.message.error{color:#d32f2f}
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            font-family: "Avenir Book", "Avenir", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .logo {
+            width: 100px;
+            height: auto;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            border: 1px solid #d2d2d7;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            padding: 40px 50px;
+            border-radius: 18px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .form-container h1 {
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-top: 0;
+            margin-bottom: 35px;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: normal;
+            color: #86868b;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #f5f5f7;
+            border: 1px solid #d2d2d7;
+            border-radius: 10px;
+            color: #1d1d1f;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            font-family: inherit;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #007aff;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #000000;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            margin-top: 15px;
+        }
+
+        .submit-button:hover {
+            background-color: #333333;
+        }
+        
+        .submit-button:disabled {
+            background-color: #d2d2d7;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-weight: normal;
+            font-size: 14px;
+            min-height: 20px;
+        }
+
+        .message.success {
+            color: #2e7d32;
+        }
+
+        .message.error {
+            color: #d32f2f;
+        }
     </style>
 </head>
 <body>
+    
+    <img src="logo22.png" alt="Top Logo" class="logo">
+
     <div class="form-container">
-        <h1>INSCRIPTION AU JEU</h1>
+        <h1>GAME REGISTRATION</h1>
         <form id="inscription-form">
             <div class="input-group">
-                <label for="fullname">Nom & Prénom</label>
+                <label for="fullname">Full Name</label>
                 <input type="text" id="fullname" required>
             </div>
             <div class="input-group">
-                <label for="pseudo">Pseudo</label>
+                <label for="pseudo">Nickname</label>
                 <input type="text" id="pseudo" required>
             </div>
             <div class="input-group">
-                <label for="whatsapp">Numéro WhatsApp</label>
+                <label for="whatsapp">WhatsApp Number</label>
                 <input type="tel" id="whatsapp" required>
             </div>
-            <button type="submit" class="submit-button">S'INSCRIRE</button>
+            <button type="submit" class="submit-button">REGISTER</button>
         </form>
         <div id="message-area" class="message"></div>
     </div>
 
+    <img src="logo23.png" alt="Bottom Logo" class="logo">
+
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-      const firebaseConfig = {
-        apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
-        authDomain: "roue-de-la-chance-c0f6a.firebaseapp.com",
-        projectId: "roue-de-la-chance-c0f6a",
-        storageBucket: "roue-de-la-chance-c0f6a.appspot.com",
-        messagingSenderId: "491916732335",
-        appId: "1:491916732335:web:7a9765b2720d995583315a"
-      };
-      const app = initializeApp(firebaseConfig);
-      window.db = getFirestore(app);
-      window.firestoreFunctions = { collection, addDoc, getDocs, query, where };
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, doc, getDocs, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
+            authDomain: "roue-de-la-chance-c0f6a.firebaseapp.com",
+            projectId: "roue-de-la-chance-c0f6a",
+            storageBucket: "roue-de-la-chance-c0f6a.appspot.com",
+            messagingSenderId: "491916732335",
+            appId: "1:491916732335:web:7a9765b2720d995583315a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.firestoreFunctions = { collection, doc, getDocs, setDoc, query, where };
     </script>
 
     <script>
         const form = document.getElementById('inscription-form');
-        const fullnameInput = document.getElementById('fullname');
         const pseudoInput = document.getElementById('pseudo');
+        const fullnameInput = document.getElementById('fullname');
         const whatsappInput = document.getElementById('whatsapp');
         const messageArea = document.getElementById('message-area');
         const submitButton = document.querySelector('.submit-button');
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const sessionId = urlParams.get('session');
-
-        console.log("URL Actuelle:", window.location.href);
-        console.log("Session ID Trouvé:", sessionId);
-
-        if (!sessionId) {
-            document.querySelector('.form-container').innerHTML = '<h1>Lien d\'invitation invalide</h1><p>Aucun ID de session n\'a été trouvé dans l\'URL.</p>';
+        function getSessionIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('session');
         }
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
-            const { db, firestoreFunctions } = window;
-            const fullname = fullnameInput.value.trim();
-            const pseudo = pseudoInput.value.trim();
-            const whatsapp = whatsappInput.value.trim();
             
-            messageArea.textContent = '';
-            messageArea.className = 'message';
-            
-            if (!fullname || !pseudo || !whatsapp) {
-                displayMessage("Veuillez remplir tous les champs.", "error");
+            const sessionId = getSessionIdFromUrl();
+            if (!sessionId) {
+                displayMessage("Error: Session ID missing from URL.", "error");
                 return;
             }
 
-            submitButton.textContent = 'VÉRIFICATION...';
+            const pseudo = pseudoInput.value.trim();
+            const fullname = fullnameInput.value.trim();
+            const whatsapp = whatsappInput.value.trim();
+
+            if (!pseudo || !fullname || !whatsapp) {
+                displayMessage("Please fill in all fields.", "error");
+                return;
+            }
+            
+            messageArea.textContent = '';
+            messageArea.className = 'message';
+            submitButton.textContent = 'CHECKING...';
             submitButton.disabled = true;
 
+            const { db, firestoreFunctions } = window;
+            const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
+            const q = firestoreFunctions.query(participantsRef, firestoreFunctions.where("pseudo_lowercase", "==", pseudo.toLowerCase()));
+
             try {
-                const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
-                const q = firestoreFunctions.query(participantsRef, firestoreFunctions.where("pseudo_lower", "==", pseudo.toLowerCase()));
                 const querySnapshot = await firestoreFunctions.getDocs(q);
 
                 if (!querySnapshot.empty) {
-                    displayMessage("Ce pseudo est déjà utilisé.", "error");
-                    submitButton.textContent = "S'INSCRIRE";
+                    displayMessage("This nickname is already taken.", "error");
+                    submitButton.textContent = "REGISTER";
                     submitButton.disabled = false;
                 } else {
-                    await firestoreFunctions.addDoc(participantsRef, {
+                    const newParticipantRef = firestoreFunctions.doc(participantsRef);
+                    await firestoreFunctions.setDoc(newParticipantRef, {
                         fullname: fullname,
                         pseudo: pseudo,
+                        pseudo_lowercase: pseudo.toLowerCase(),
                         whatsapp: whatsapp,
-                        pseudo_lower: pseudo.toLowerCase(),
-                        createdAt: new Date()
+                        timestamp: new Date()
                     });
-                    displayMessage("Inscription réussie !", "success");
-                    submitButton.textContent = 'INSCRIT !';
+                    
+                    displayMessage("Registration successful!", "success");
+                    submitButton.textContent = 'REGISTERED!';
                 }
             } catch (error) {
-                console.error("Erreur avec Firestore: ", error);
-                displayMessage("Une erreur est survenue. Veuillez réessayer.", "error");
-                submitButton.textContent = "S'INSCRIRE";
+                console.error("Error with Firestore:", error);
+                displayMessage("An error occurred. Please try again.", "error");
+                submitButton.textContent = "REGISTER";
                 submitButton.disabled = false;
             }
         });
@@ -115,6 +236,16 @@
                 messageArea.classList.add(type);
             }
         }
+
+        function checkFirebaseReady() {
+            if (window.db && window.firestoreFunctions) {
+                console.log("Firebase is ready.");
+            } else {
+                setTimeout(checkFirebaseReady, 50);
+            }
+        }
+        checkFirebaseReady();
     </script>
 </body>
 </html>
+
