@@ -178,7 +178,7 @@
             padding: 12px 16px;
             border-bottom: 1px solid #e8e8e8;
             transition: all 0.2s ease;
-            font-size: 14px;
+            font-size: 13px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -190,23 +190,32 @@
             background-color: #f5f5f7;
         }
 
-        .participant-name {
+        .participant-info {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .participant-main {
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .participant-details {
+            font-size: 11px;
+            color: #666;
         }
 
         .participant-actions {
             display: flex;
             gap: 8px;
-            opacity: 0;
+            opacity: 1;
             transition: opacity 0.2s ease;
         }
 
-        #participant-list li:hover .participant-actions {
-            opacity: 1;
-        }
-
         .winner-btn {
-            width: 24px;
+            width: 45px;
             height: 24px;
             background-color: transparent;
             border: 1px solid #ccc;
@@ -217,6 +226,9 @@
             justify-content: center;
             transition: all 0.2s ease;
             padding: 0;
+            font-size: 10px;
+            font-weight: 600;
+            color: #666;
         }
 
         .winner-btn:hover {
@@ -227,10 +239,7 @@
         .winner-btn.active {
             background-color: #333;
             border-color: #333;
-        }
-
-        .winner-btn.active svg {
-            fill: white;
+            color: white;
         }
 
         .delete-btn {
@@ -396,6 +405,7 @@
                 <div class="participants-header">
                     <h2>Participants Inscrits (<span id="participant-count">0</span>)</h2>
                     <div class="participants-actions">
+                        <input type="text" id="search-input" placeholder="Rechercher..." style="padding: 8px 12px; border: 1px solid #d2d2d7; border-radius: 6px; font-size: 12px; width: 200px;">
                         <button class="download-btn" id="download-btn" disabled>Télécharger CSV</button>
                     </div>
                 </div>
@@ -461,6 +471,7 @@
         const importConfirm = document.getElementById('import-confirm');
         const importCancel = document.getElementById('import-cancel');
         const downloadBtn = document.getElementById('download-btn');
+        const searchInput = document.getElementById('search-input');
         const winnerSlotsUI = [
             document.querySelector('#winner-slot-0 .name'),
             document.querySelector('#winner-slot-1 .name'),
@@ -469,14 +480,14 @@
         ];
         
         let participants = [];
+        let allParticipants = []; // Copie pour la recherche
         let winnerSlots = [null, null, null, null];
         let currentSessionId = null;
         let unsubscribe = null;
         let randomMode = false;
+        let winnerCounter = 0; // Compteur pour WIN 1, WIN 2, etc.
 
-        // DÉFINIR TOUTES LES FONCTIONS EN PREMIER
-        
-        // Fonction pour gérer la sélection des gagnants
+        // Nouvelle fonction pour gérer la sélection des gagnants avec numérotation
         async function toggleWinner(pseudo, buttonElement) {
             const isAlreadyWinner = winnerSlots.includes(pseudo);
 
@@ -484,11 +495,13 @@
                 const winnerIndex = winnerSlots.indexOf(pseudo);
                 winnerSlots[winnerIndex] = null;
                 buttonElement.classList.remove('active');
+                buttonElement.textContent = 'WIN';
             } else {
                 const emptySlotIndex = winnerSlots.indexOf(null);
                 if (emptySlotIndex !== -1) {
                     winnerSlots[emptySlotIndex] = pseudo;
                     buttonElement.classList.add('active');
+                    buttonElement.textContent = `WIN ${emptySlotIndex + 1}`;
                 } else {
                     alert("Toutes les places de gagnant sont déjà sélectionnées.");
                     return;
@@ -508,6 +521,27 @@
                 randomMode: randomMode 
             }, { merge: true });
         }
+
+        // Fonction de recherche
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                participants = [...allParticipants];
+            } else {
+                participants = allParticipants.filter(participant => {
+                    const fullname = (participant.fullname || '').toLowerCase();
+                    const pseudo = (participant.pseudo || '').toLowerCase();
+                    const whatsapp = (participant.whatsapp || '').toLowerCase();
+                    
+                    return fullname.includes(searchTerm) || 
+                           pseudo.includes(searchTerm) || 
+                           whatsapp.includes(searchTerm);
+                });
+            }
+            
+            renderParticipants();
+        });
 
         // Fonction pour supprimer un participant
         async function deleteParticipant(participantId, pseudo) {
@@ -580,48 +614,71 @@
             const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
 
             unsubscribe = firestoreFunctions.onSnapshot(participantsRef, (snapshot) => {
-                participants = [];
-                participantList.innerHTML = '';
+                allParticipants = [];
                 snapshot.forEach(doc => {
                     const participantData = doc.data();
-                    participantData.id = doc.id; // Stocker l'ID du document
-                    participants.push(participantData);
-                    
-                    const li = document.createElement('li');
-                    const nameSpan = document.createElement('span');
-                    nameSpan.className = 'participant-name';
-                    nameSpan.textContent = participantData.pseudo;
-                    
-                    const actionsDiv = document.createElement('div');
-                    actionsDiv.className = 'participant-actions';
-                    
-                    // Bouton gagnant (coupe)
-                    const winnerBtn = document.createElement('button');
-                    winnerBtn.className = 'winner-btn';
-                    winnerBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M5 16L3 14v-3c0-1.1.9-2 2-2h1V7a1 1 0 011-1h10a1 1 0 011 1v2h1c1.1 0 2 .9 2 2v3l-2 2v5H5v-5zm2 0h10v3H7v-3zm10-2V11H7v3h10zm-1-5V8H8v1h8z"/></svg>';
-                    winnerBtn.addEventListener('click', () => toggleWinner(participantData.pseudo, winnerBtn));
-                    
-                    // Bouton supprimer (croix)
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'delete-btn';
-                    deleteBtn.innerHTML = '✕';
-                    deleteBtn.addEventListener('click', () => deleteParticipant(doc.id, participantData.pseudo));
-                    
-                    actionsDiv.appendChild(winnerBtn);
-                    actionsDiv.appendChild(deleteBtn);
-                    
-                    li.appendChild(nameSpan);
-                    li.appendChild(actionsDiv);
-                    li.dataset.pseudo = participantData.pseudo;
-                    participantList.appendChild(li);
+                    participantData.id = doc.id;
+                    allParticipants.push(participantData);
                 });
-                participantCountSpan.textContent = participants.length;
                 
-                // Activer le bouton de téléchargement si il y a des participants
-                downloadBtn.disabled = participants.length === 0;
-                
-                updateSelectedState();
+                participants = [...allParticipants]; // Copie pour l'affichage
+                renderParticipants();
             });
+        }
+
+        function renderParticipants() {
+            participantList.innerHTML = '';
+            winnerCounter = 0; // Reset du compteur
+            
+            participants.forEach(participantData => {
+                const li = document.createElement('li');
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'participant-info';
+                
+                const mainDiv = document.createElement('div');
+                mainDiv.className = 'participant-main';
+                mainDiv.textContent = `${participantData.fullname || 'N/A'} (${participantData.pseudo})`;
+                
+                const detailsDiv = document.createElement('div');
+                detailsDiv.className = 'participant-details';
+                detailsDiv.textContent = `WhatsApp: ${participantData.whatsapp || 'N/A'} • ${participantData.imported ? 'Importé' : 'Formulaire'}`;
+                
+                infoDiv.appendChild(mainDiv);
+                infoDiv.appendChild(detailsDiv);
+                
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'participant-actions';
+                
+                // Bouton gagnant avec texte WIN X
+                const winnerBtn = document.createElement('button');
+                winnerBtn.className = 'winner-btn';
+                const winnerSlotIndex = winnerSlots.indexOf(participantData.pseudo);
+                if (winnerSlotIndex !== -1) {
+                    winnerBtn.textContent = `WIN ${winnerSlotIndex + 1}`;
+                    winnerBtn.classList.add('active');
+                } else {
+                    winnerBtn.textContent = 'WIN';
+                }
+                winnerBtn.addEventListener('click', () => toggleWinner(participantData.pseudo, winnerBtn));
+                
+                // Bouton supprimer
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '✕';
+                deleteBtn.addEventListener('click', () => deleteParticipant(participantData.id, participantData.pseudo));
+                
+                actionsDiv.appendChild(winnerBtn);
+                actionsDiv.appendChild(deleteBtn);
+                
+                li.appendChild(infoDiv);
+                li.appendChild(actionsDiv);
+                li.dataset.pseudo = participantData.pseudo;
+                participantList.appendChild(li);
+            });
+            
+            participantCountSpan.textContent = participants.length;
+            downloadBtn.disabled = participants.length === 0;
         }
 
         // MAINTENANT LES EVENT LISTENERS
