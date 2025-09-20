@@ -241,10 +241,10 @@
 
         createSessionBtn.addEventListener('click', () => {
             currentSessionId = `session-${Date.now().toString(36)}`;
-            const baseUrl = 'https://opikorporation.github.io/touteterrasky/';
+            const baseUrl = 'https://opikorporation.github.io/roueterrasky/';
             
             inscriptionLinkInput.value = `${baseUrl}formulaire.html?session=${currentSessionId}`;
-            wheelLinkInput.value = `${baseUrl}?session=${currentSessionId}`;
+            wheelLinkInput.value = `${baseUrl}index.html?session=${currentSessionId}`;
             
             sessionLinksDiv.style.display = 'block';
             createSessionBtn.disabled = true;
