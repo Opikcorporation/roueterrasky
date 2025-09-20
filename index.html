@@ -76,6 +76,8 @@
     <script>
         let participants = [];
         let predefinedWinners = [];
+        let randomMode = false;
+        let currentWinnerIndex = 0;
         const segmentColors = ["#30b9aa", "#4ac2b7", "#64ccc4", "#7ed5d1"];
         const spinDuration = 10;
         const totalSpins = 6;
@@ -118,16 +120,14 @@
             const sessionDocRef = firestoreFunctions.doc(db, "sessions", sessionId);
             const sessionDoc = await firestoreFunctions.getDoc(sessionDocRef);
             if (sessionDoc.exists()) {
-                predefinedWinners = (sessionDoc.data().winners || []).filter(w => w !== null);
+                const sessionData = sessionDoc.data();
+                predefinedWinners = (sessionData.winners || []).filter(w => w !== null);
+                randomMode = sessionData.randomMode || false;
             }
             
             if (participants.length > 0) {
                 createWheel();
-                if (predefinedWinners.length > 0) {
-                    spinButton.disabled = false;
-                } else {
-                    spinButton.textContent = "Pas de gagnants";
-                }
+                spinButton.disabled = false;
             } else {
                 spinButton.textContent = "Pas de participants";
             }
@@ -161,14 +161,6 @@
             participants.forEach((name, i) => {
                 const startAngle = i * anglePerSegment;
                 const midAngle = startAngle + anglePerSegment / 2;
-                
-                // Création du segment transparent pour le texte
-                const textSegment = document.createElementNS(svgNS, "path");
-                const x1 = 250 + 250 * Math.cos(Math.PI * startAngle / 180), y1 = 250 + 250 * Math.sin(Math.PI * startAngle / 180);
-                const x2 = 250 + 250 * Math.cos(Math.PI * (startAngle + anglePerSegment) / 180), y2 = 250 + 250 * Math.sin(Math.PI * (startAngle + anglePerSegment) / 180);
-                textSegment.setAttribute("d", `M250,250 L${x1},${y1} A250,250 0 0,1 ${x2},${y2} z`);
-                textSegment.setAttribute("fill", "transparent");
-                textSegment.setAttribute("id", `segment-${i}`);
                 
                 // Création du chemin radial pour le texte (du centre vers l'extérieur)
                 const textPathElement = document.createElementNS(svgNS, "path");
@@ -218,11 +210,21 @@
             wheelDiv.appendChild(svg);
         }
         
-        let isSpinning = false, currentWinnerIndex = 0;
+        let isSpinning = false;
         spinButton.addEventListener('click', () => {
-            if (isSpinning || currentWinnerIndex >= predefinedWinners.length) return;
+            if (isSpinning) return;
 
-            const winnerName = predefinedWinners[currentWinnerIndex];
+            let winnerName;
+            
+            // Mode aléatoire ou pas de gagnants prédéfinis ou gagnants épuisés
+            if (randomMode || predefinedWinners.length === 0 || currentWinnerIndex >= predefinedWinners.length) {
+                winnerName = participants[Math.floor(Math.random() * participants.length)];
+            } else {
+                // Mode gagnants prédéfinis
+                winnerName = predefinedWinners[currentWinnerIndex];
+                currentWinnerIndex++;
+            }
+
             isSpinning = true; 
             spinButton.disabled = true;
             const winnerIndexOnWheel = participants.indexOf(winnerName);
@@ -234,20 +236,17 @@
                 return;
             }
 
-            // --- CALCUL D'ALIGNEMENT CURSEUR CORRIGÉ ---
+            // Calcul d'alignement curseur
             const anglePerSegment = 360 / participants.length;
-            // Angle du centre du segment gagnant (0° = droite dans SVG)
             const winnerAngle = (winnerIndexOnWheel * anglePerSegment) + (anglePerSegment / 2);
-            // Le curseur pointe vers le haut (270° dans le système SVG ou -90°)
-            // On veut que le segment gagnant soit aligné avec le curseur
             const targetRotation = -(winnerAngle - 270);
 
             const currentRotation = gsap.getProperty(wheelDiv, "rotation") || 0;
             const finalRotation = currentRotation + (360 * totalSpins) + targetRotation;
             
             spinSound.play();
-            gsap.to([wheelDiv, textContainer], {
-                rotation: `+=${finalRotation}`, 
+            gsap.to(wheelDiv, {
+                rotation: finalRotation, 
                 duration: spinDuration, 
                 ease: "power4.out",
                 onComplete: () => {
@@ -276,13 +275,8 @@
             // Remise à zéro de la rotation de la roue pour le prochain spin
             gsap.set(wheelDiv, { rotation: 0 });
             
-            currentWinnerIndex++;
-            if (currentWinnerIndex < predefinedWinners.length) {
-                spinButton.disabled = false;
-            } else {
-                spinButton.textContent = "Jeu Terminé";
-                spinButton.disabled = true;
-            }
+            // Le bouton reste toujours activé pour permettre des spins illimités
+            spinButton.disabled = false;
         });
 
         function checkFirebaseReady() {
