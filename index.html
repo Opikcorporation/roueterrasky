@@ -234,16 +234,16 @@
                 return;
             }
 
-            // --- CALCUL CORRIGÉ POUR ALIGNEMENT PARFAIT AVEC LE CURSEUR ---
+            // --- CALCUL D'ALIGNEMENT CURSEUR CORRIGÉ ---
             const anglePerSegment = 360 / participants.length;
-            // Calcul de l'angle du centre du segment gagnant
+            // Angle du centre du segment gagnant (0° = droite dans SVG)
             const winnerAngle = (winnerIndexOnWheel * anglePerSegment) + (anglePerSegment / 2);
-            // Le curseur pointe vers le haut (-90° dans le système SVG)
-            // On veut aligner le centre du segment gagnant avec le curseur
-            const targetRotation = 90 - winnerAngle;
+            // Le curseur pointe vers le haut (270° dans le système SVG ou -90°)
+            // On veut que le segment gagnant soit aligné avec le curseur
+            const targetRotation = -(winnerAngle - 270);
 
             const currentRotation = gsap.getProperty(wheelDiv, "rotation") || 0;
-            const finalRotation = (360 * totalSpins) + targetRotation;
+            const finalRotation = currentRotation + (360 * totalSpins) + targetRotation;
             
             spinSound.play();
             gsap.to([wheelDiv, textContainer], {
