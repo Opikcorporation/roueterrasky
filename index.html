@@ -153,48 +153,68 @@
                 path.setAttribute("d", `M250,250 L${x1},${y1} A250,250 0 0,1 ${x2},${y2} z`);
                 path.setAttribute("fill", segmentColors[i % segmentColors.length]);
                 svg.appendChild(path);
+            });
+            
+            // Création d'un groupe SVG pour les textes par-dessus
+            const textGroup = document.createElementNS(svgNS, "g");
+            
+            participants.forEach((name, i) => {
+                const startAngle = i * anglePerSegment;
+                const midAngle = startAngle + anglePerSegment / 2;
                 
-                // Création du texte avec la même logique géométrique
+                // Création du segment transparent pour le texte
+                const textSegment = document.createElementNS(svgNS, "path");
+                const x1 = 250 + 250 * Math.cos(Math.PI * startAngle / 180), y1 = 250 + 250 * Math.sin(Math.PI * startAngle / 180);
+                const x2 = 250 + 250 * Math.cos(Math.PI * (startAngle + anglePerSegment) / 180), y2 = 250 + 250 * Math.sin(Math.PI * (startAngle + anglePerSegment) / 180);
+                textSegment.setAttribute("d", `M250,250 L${x1},${y1} A250,250 0 0,1 ${x2},${y2} z`);
+                textSegment.setAttribute("fill", "transparent");
+                textSegment.setAttribute("id", `segment-${i}`);
+                
+                // Création du chemin radial pour le texte (du centre vers l'extérieur)
+                const textPathElement = document.createElementNS(svgNS, "path");
+                const pathId = `textpath-${i}`;
+                
+                // Ligne radiale du centre vers l'extérieur au milieu du segment
+                const innerRadius = 70; // Distance du centre noir
+                const outerRadius = 220; // Avant le bord de la roue
+                const innerX = 250 + innerRadius * Math.cos(Math.PI * midAngle / 180);
+                const innerY = 250 + innerRadius * Math.sin(Math.PI * midAngle / 180);
+                const outerX = 250 + outerRadius * Math.cos(Math.PI * midAngle / 180);
+                const outerY = 250 + outerRadius * Math.sin(Math.PI * midAngle / 180);
+                
+                textPathElement.setAttribute("id", pathId);
+                textPathElement.setAttribute("d", `M${innerX},${innerY} L${outerX},${outerY}`);
+                textPathElement.setAttribute("fill", "none");
+                textPathElement.setAttribute("stroke", "none");
+                
+                // Ajout du chemin aux définitions
+                let defs = svg.querySelector("defs");
+                if (!defs) {
+                    defs = document.createElementNS(svgNS, "defs");
+                    svg.appendChild(defs);
+                }
+                defs.appendChild(textPathElement);
+                
+                // Création du texte qui suit le chemin radial
                 const textElement = document.createElementNS(svgNS, "text");
                 const textPath = document.createElementNS(svgNS, "textPath");
-                const defs = svg.querySelector("defs") || document.createElementNS(svgNS, "defs");
-                if (!svg.querySelector("defs")) svg.appendChild(defs);
                 
-                // Création d'un arc invisible pour guider le texte
-                const arcPath = document.createElementNS(svgNS, "path");
-                const arcId = `arc-${i}`;
-                const midAngle = startAngle + anglePerSegment / 2;
-                const textRadius = 140; // Distance du centre pour le texte
-                
-                // Arc centré sur le milieu du segment
-                const arcStartAngle = midAngle - 10; // Arc de 20° centré
-                const arcEndAngle = midAngle + 10;
-                const arcX1 = 250 + textRadius * Math.cos(Math.PI * arcStartAngle / 180);
-                const arcY1 = 250 + textRadius * Math.sin(Math.PI * arcStartAngle / 180);
-                const arcX2 = 250 + textRadius * Math.cos(Math.PI * arcEndAngle / 180);
-                const arcY2 = 250 + textRadius * Math.sin(Math.PI * arcEndAngle / 180);
-                
-                arcPath.setAttribute("id", arcId);
-                arcPath.setAttribute("d", `M${arcX1},${arcY1} A${textRadius},${textRadius} 0 0,1 ${arcX2},${arcY2}`);
-                arcPath.setAttribute("fill", "none");
-                arcPath.setAttribute("stroke", "none");
-                defs.appendChild(arcPath);
-                
-                // Texte suivant l'arc
-                const truncatedName = name.length > 8 ? name.substring(0, 6) + '...' : name;
-                textPath.setAttribute("href", `#${arcId}`);
-                textPath.setAttribute("startOffset", "50%"); // Centré sur l'arc
+                const truncatedName = name.length > 10 ? name.substring(0, 8) + '...' : name;
+                textPath.setAttribute("href", `#${pathId}`);
+                textPath.setAttribute("startOffset", "50%"); // Centré sur la ligne radiale
                 textPath.setAttribute("text-anchor", "middle");
                 textPath.textContent = truncatedName;
                 
                 textElement.appendChild(textPath);
                 textElement.setAttribute("fill", "#fff");
                 textElement.setAttribute("font-family", "Poppins, sans-serif");
-                textElement.setAttribute("font-size", "14");
+                textElement.setAttribute("font-size", "12");
                 textElement.setAttribute("font-weight", "700");
-                svg.appendChild(textElement);
+                
+                textGroup.appendChild(textElement);
             });
             
+            svg.appendChild(textGroup);
             wheelDiv.appendChild(svg);
         }
         
