@@ -25,7 +25,6 @@
 <body>
     <div id="bg-animation"></div>
     <img src="background.png" class="overlay-background">
-
     <img src="logo1.png" alt="Terra Sky" class="top-center-logo">
     <img src="Win1000AED.png" alt="Titre" class="corner-image" id="top-left">
     <img src="Win1000AED.png" alt="Titre" class="corner-image" id="top-right">
@@ -76,6 +75,7 @@
     <script>
         let participants = [];
         let predefinedWinners = [];
+        let drawnWinners = []; // NOUVEAU : Pour suivre TOUS les gagnants (prédéfinis + aléatoires)
         const segmentColors = ["#30b9aa", "#4ac2b7", "#64ccc4", "#7ed5d1"];
         const spinDuration = 10;
         const totalSpins = 6;
@@ -120,14 +120,12 @@
             if (sessionDoc.exists()) {
                 predefinedWinners = (sessionDoc.data().winners || []).filter(w => w !== null);
             }
+            // On initialise la liste des gagnants déjà tirés avec les gagnants prédéfinis
+            drawnWinners = [...predefinedWinners];
             
             if (participants.length > 0) {
                 createWheel();
-                if (predefinedWinners.length > 0) {
-                    spinButton.disabled = false;
-                } else {
-                    spinButton.textContent = "Pas de gagnants";
-                }
+                spinButton.disabled = false; // On active le bouton s'il y a des participants
             } else {
                 spinButton.textContent = "Pas de participants";
             }
@@ -145,84 +143,59 @@
             participants.forEach((name, i) => {
                 const startAngle = i * anglePerSegment;
                 const endAngle = startAngle + anglePerSegment;
-                
-                // Création du segment coloré
                 const path = document.createElementNS(svgNS, "path");
                 const x1 = 250 + 250 * Math.cos(Math.PI * startAngle / 180), y1 = 250 + 250 * Math.sin(Math.PI * startAngle / 180);
                 const x2 = 250 + 250 * Math.cos(Math.PI * endAngle / 180), y2 = 250 + 250 * Math.sin(Math.PI * endAngle / 180);
                 path.setAttribute("d", `M250,250 L${x1},${y1} A250,250 0 0,1 ${x2},${y2} z`);
                 path.setAttribute("fill", segmentColors[i % segmentColors.length]);
                 svg.appendChild(path);
+                
+                const textAngle = startAngle + anglePerSegment / 2;
+                const textDiv = document.createElement('div');
+                textDiv.className = 'participant-text';
+                const textSpan = document.createElement('span');
+                const truncatedName = name.length > 12 ? name.substring(0, 10) + '...' : name;
+                textSpan.innerText = truncatedName;
+                textDiv.appendChild(textSpan);
+                textDiv.style.transform = `rotate(${textAngle}deg) translateX(110px)`;
+                textContainer.appendChild(textDiv);
             });
             
-            // Création d'un groupe SVG pour les textes par-dessus
-            const textGroup = document.createElementNS(svgNS, "g");
-            
-            participants.forEach((name, i) => {
-                const startAngle = i * anglePerSegment;
-                const midAngle = startAngle + anglePerSegment / 2;
-                
-                // Création du segment transparent pour le texte
-                const textSegment = document.createElementNS(svgNS, "path");
-                const x1 = 250 + 250 * Math.cos(Math.PI * startAngle / 180), y1 = 250 + 250 * Math.sin(Math.PI * startAngle / 180);
-                const x2 = 250 + 250 * Math.cos(Math.PI * (startAngle + anglePerSegment) / 180), y2 = 250 + 250 * Math.sin(Math.PI * (startAngle + anglePerSegment) / 180);
-                textSegment.setAttribute("d", `M250,250 L${x1},${y1} A250,250 0 0,1 ${x2},${y2} z`);
-                textSegment.setAttribute("fill", "transparent");
-                textSegment.setAttribute("id", `segment-${i}`);
-                
-                // Création du chemin radial pour le texte (du centre vers l'extérieur)
-                const textPathElement = document.createElementNS(svgNS, "path");
-                const pathId = `textpath-${i}`;
-                
-                // Ligne radiale du centre vers l'extérieur au milieu du segment
-                const innerRadius = 70; // Distance du centre noir
-                const outerRadius = 220; // Avant le bord de la roue
-                const innerX = 250 + innerRadius * Math.cos(Math.PI * midAngle / 180);
-                const innerY = 250 + innerRadius * Math.sin(Math.PI * midAngle / 180);
-                const outerX = 250 + outerRadius * Math.cos(Math.PI * midAngle / 180);
-                const outerY = 250 + outerRadius * Math.sin(Math.PI * midAngle / 180);
-                
-                textPathElement.setAttribute("id", pathId);
-                textPathElement.setAttribute("d", `M${innerX},${innerY} L${outerX},${outerY}`);
-                textPathElement.setAttribute("fill", "none");
-                textPathElement.setAttribute("stroke", "none");
-                
-                // Ajout du chemin aux définitions
-                let defs = svg.querySelector("defs");
-                if (!defs) {
-                    defs = document.createElementNS(svgNS, "defs");
-                    svg.appendChild(defs);
-                }
-                defs.appendChild(textPathElement);
-                
-                // Création du texte qui suit le chemin radial
-                const textElement = document.createElementNS(svgNS, "text");
-                const textPath = document.createElementNS(svgNS, "textPath");
-                
-                const truncatedName = name.length > 10 ? name.substring(0, 8) + '...' : name;
-                textPath.setAttribute("href", `#${pathId}`);
-                textPath.setAttribute("startOffset", "50%"); // Centré sur la ligne radiale
-                textPath.setAttribute("text-anchor", "middle");
-                textPath.textContent = truncatedName;
-                
-                textElement.appendChild(textPath);
-                textElement.setAttribute("fill", "#fff");
-                textElement.setAttribute("font-family", "Poppins, sans-serif");
-                textElement.setAttribute("font-size", "12");
-                textElement.setAttribute("font-weight", "700");
-                
-                textGroup.appendChild(textElement);
-            });
-            
-            svg.appendChild(textGroup);
             wheelDiv.appendChild(svg);
         }
         
-        let isSpinning = false, currentWinnerIndex = 0;
+        let isSpinning = false;
+        let currentPredefinedWinnerIndex = 0; // Index pour suivre les gagnants prédéfinis
         spinButton.addEventListener('click', () => {
-            if (isSpinning || currentWinnerIndex >= predefinedWinners.length) return;
+            if (isSpinning) return;
 
-            const winnerName = predefinedWinners[currentWinnerIndex];
+            let winnerName;
+            
+            // --- LOGIQUE DE SÉLECTION DU GAGNANT (PRÉDÉFINI PUIS ALÉATOIRE) ---
+            if (currentPredefinedWinnerIndex < predefinedWinners.length) {
+                // Phase 1: On tire les gagnants prédéfinis
+                winnerName = predefinedWinners[currentPredefinedWinnerIndex];
+                currentPredefinedWinnerIndex++;
+            } else {
+                // Phase 2: On passe en mode aléatoire
+                const availableParticipants = participants.filter(p => !drawnWinners.includes(p));
+                if (availableParticipants.length === 0) {
+                    spinButton.textContent = "Jeu Terminé";
+                    spinButton.disabled = true;
+                    return;
+                }
+                winnerName = availableParticipants[Math.floor(Math.random() * availableParticipants.length)];
+            }
+            
+            // On ajoute le gagnant à la liste des tirés au sort pour ne pas le retirer
+            if (!drawnWinners.includes(winnerName)) {
+                drawnWinners.push(winnerName);
+            }
+            
+            spinToWinner(winnerName);
+        });
+
+        function spinToWinner(winnerName) {
             isSpinning = true; 
             spinButton.disabled = true;
             const winnerIndexOnWheel = participants.indexOf(winnerName);
@@ -234,16 +207,12 @@
                 return;
             }
 
-            // --- CALCUL D'ALIGNEMENT CURSEUR CORRIGÉ ---
             const anglePerSegment = 360 / participants.length;
-            // Angle du centre du segment gagnant (0° = droite dans SVG)
             const winnerAngle = (winnerIndexOnWheel * anglePerSegment) + (anglePerSegment / 2);
-            // Le curseur pointe vers le haut (270° dans le système SVG ou -90°)
-            // On veut que le segment gagnant soit aligné avec le curseur
-            const targetRotation = -(winnerAngle - 270);
+            const targetRotation = 360 - winnerAngle + (anglePerSegment / 2);
 
-            const currentRotation = gsap.getProperty(wheelDiv, "rotation") || 0;
-            const finalRotation = currentRotation + (360 * totalSpins) + targetRotation;
+            const currentRotation = gsap.getProperty(textContainer, "rotation") % 360;
+            const finalRotation = (360 * totalSpins) + targetRotation - currentRotation;
             
             spinSound.play();
             gsap.to([wheelDiv, textContainer], {
@@ -256,7 +225,7 @@
                     announceWinner(winnerName);
                 }
             });
-        });
+        }
 
         function announceWinner(winnerName) {
             winSound.play();
@@ -273,11 +242,8 @@
             confettiDiv1.style.display = 'none'; confettiDiv2.style.display = 'none';
             confettiDiv3.style.display = 'none'; confettiDiv4.style.display = 'none';
             
-            // Remise à zéro de la rotation de la roue pour le prochain spin
-            gsap.set(wheelDiv, { rotation: 0 });
-            
-            currentWinnerIndex++;
-            if (currentWinnerIndex < predefinedWinners.length) {
+            // On vérifie s'il reste des participants à tirer au sort
+            if (drawnWinners.length < participants.length) {
                 spinButton.disabled = false;
             } else {
                 spinButton.textContent = "Jeu Terminé";
@@ -296,3 +262,4 @@
     </script>
 </body>
 </html>
+
