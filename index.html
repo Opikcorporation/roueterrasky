@@ -3,290 +3,700 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roue de la Chance</title>
+    <title>Tableau de Bord Administrateur</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Montserrat:wght@800&display=swap');
-        :root{--wheel-size: 450px;}body{margin:0;padding:20px;box-sizing:border-box;font-family:'Poppins',sans-serif;background-color:#1a023b;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;overflow:hidden;position:relative}#bg-animation{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
-        .overlay-background{position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;}
-        .top-center-logo{position:fixed;top:20px;left:50%;transform:translateX(-50%);width:150px;height:auto;z-index:20}.corner-image{position:fixed;width:250px;height:auto;z-index:10;opacity:.9}#top-left{top:20px;left:20px}#top-right{top:20px;right:20px}#bottom-left{bottom:20px;left:20px}#bottom-right{bottom:20px;right:20px}.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;display:none}#confetti-animation-1{z-index:202}#confetti-animation-2{z-index:203}#confetti-animation-3{z-index:198}#confetti-animation-4{z-index:199}#glow-animation{position:absolute;width:130%;height:130%;z-index:3}#glow-animation-2{position:absolute;width:150%;height:150%;z-index:1;opacity:.7}.main-container{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;z-index:5}.wheel-container{position:relative;width:var(--wheel-size);height:var(--wheel-size);max-width:95vw;max-height:80vh;display:flex;justify-content:center;align-items:center}
-        .wheel-container::before{content:'';position:absolute;top:-5px;left:-5px;right:-5px;bottom:-5px;border:3px solid #30b9aa;border-radius:50%;z-index:2}
-        .wheel{width:100%;aspect-ratio:1/1;border-radius:50%;position:relative;overflow:hidden;border:12px solid #000;box-shadow:0 0 25px rgba(0,0,0,.5),inset 0 0 10px rgba(0,0,0,.5);z-index:2;box-sizing:border-box;}
-        .wheel-center{position:absolute;width:28%;height:28%;background-color:#000;border-radius:50%;z-index:5;box-shadow:0 0 15px rgba(255,255,255,.2);background-image:url(icon.png);background-size:85%;background-position:center;background-repeat:no-repeat}
-        .ticker{position:absolute;top:-15px;left:50%;transform:translateX(-50%);width:60px;height:70px;background-image:url(curseur.png);background-size:contain;background-repeat:no-repeat;z-index:10;filter:drop-shadow(0 4px 3px rgba(0,0,0,.5))}
-        .wheel svg{width:100%;height:100%}
-        #text-container{position:absolute;width:100%;height:100%;pointer-events:none;z-index:4;border-radius:50%}
-        .participant-text{position:absolute;top:50%;left:50%;transform-origin:0 50%;font-size:clamp(7px,1.8vw,12px);font-weight:700;color:#fff;text-align:center;white-space:nowrap;pointer-events:none}
-        .participant-text span{display:inline-block}
-        #spin-button{padding:15px 40px;font-size:24px;font-weight:700;color:#fff;background:linear-gradient(45deg,#30b9aa,#2c837a);border:8px solid #000;border-radius:50px;cursor:pointer;text-transform:uppercase;box-shadow:0 5px 15px rgba(0,0,0,.3);transition:all .2s ease-in-out;z-index:10;flex-shrink:0}#spin-button:hover{transform:scale(1.05);box-shadow:0 8px 25px rgba(48,185,170,.4)}#spin-button:disabled{cursor:not-allowed;background:#ccc;transform:scale(1);box-shadow:none;color:#888; border-color: #999;}.winner-popup{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.8);z-index:200;display:none;justify-content:center;align-items:center;cursor:pointer}.winner-popup .winner-content{position:relative;z-index:201;text-align:center}
-        .winner-popup .winner-name{font-size:clamp(40px,12vw,80px);font-weight:800;padding:0 20px;color:#30b9aa;text-shadow:0 1px 0 #2a7e75,0 2px 0 #28766d,0 3px 0 #266d65,0 4px 0 #24655e,0 5px 0 #225c56,0 6px 1px rgba(0,0,0,.1),0 0 5px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.3),0 3px 5px rgba(0,0,0,.2),0 5px 10px rgba(0,0,0,.25),0 10px 10px rgba(0,0,0,.2),0 20px 20px rgba(0,0,0,.15)}
-        .winner-popup .prize-text{font-size:clamp(20px,6vw,40px);color:#fff;margin-top:-10px;text-shadow:0 0 10px #000,0 0 20px #000}@media (max-width:900px){.corner-image{width:180px}}@media (max-width:500px){.corner-image{width:100px;top:10px;left:10px;right:10px;bottom:10px}.top-center-logo{width:80px}}
+        body {
+            margin: 0;
+            font-family: "Avenir Book", "Avenir", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 30px 0;
+            text-align: left;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr;
+            gap: 20px;
+            height: calc(100vh - 120px);
+        }
+
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #d2d2d7;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .session-card {
+            grid-column: 1 / -1;
+        }
+        
+        .participants-card {
+            grid-column: 1 / 2;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .winners-card {
+            grid-column: 2 / 3;
+        }
+
+        .card h2 {
+            font-size: 20px;
+            font-weight: 900;
+            margin: 0 0 16px 0;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        #create-session-btn {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #000000;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        #create-session-btn:hover {
+            background-color: #333333;
+            transform: translateY(-1px);
+        }
+
+        #session-links {
+            margin-top: 16px;
+            display: none; 
+        }
+
+        .link-group {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .link-group label {
+            font-weight: 500;
+            color: #86868b;
+            font-size: 13px;
+        }
+        .link-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+        .link-group input {
+            flex: 1;
+            padding: 10px 12px;
+            background-color: #f5f5f7;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            color: #1d1d1f;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .copy-btn {
+            padding: 10px 16px;
+            border: 1px solid #333;
+            background-color: #000;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            min-width: 70px;
+        }
+        .copy-btn:hover { 
+            background-color: #333;
+            transform: translateY(-1px);
+        }
+
+        .participants-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .participants-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .download-btn {
+            padding: 8px 12px;
+            background-color: #666;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background-color: #555;
+            transform: translateY(-1px);
+        }
+
+        .download-btn:disabled {
+            background-color: #d2d2d7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #participant-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            max-height: 400px;
+        }
+        #participant-list li {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e8e8e8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #participant-list li:last-child {
+            border-bottom: none;
+        }
+        #participant-list li:hover {
+            background-color: #f5f5f7;
+        }
+        #participant-list li.selected {
+            background-color: #333;
+            color: white;
+            font-weight: 600;
+        }
+
+        .participant-name {
+            flex: 1;
+        }
+
+        .delete-btn {
+            padding: 4px 8px;
+            background-color: #666;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        #participant-list li:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background-color: #888;
+        }
+
+        .winner-slot {
+            background-color: #f5f5f7;
+            border: 1px dashed #d2d2d7;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+        .winner-slot .label {
+            color: #86868b;
+            font-size: 13px;
+            margin-right: 8px;
+            font-weight: 500;
+        }
+        .winner-slot.filled {
+            background-color: #e5f2ff;
+            border-color: #007aff;
+            border-style: solid;
+            font-weight: 600;
+        }
+
+        .import-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e8e8e8;
+        }
+
+        .import-btn {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            background-color: #f5f5f7;
+            border: 1px solid #333;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .import-btn:hover {
+            background-color: #e8e8e8;
+            transform: translateY(-1px);
+        }
+
+        #participant-import {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            display: none;
+            box-sizing: border-box;
+        }
+
+        .import-actions {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .import-actions button {
+            padding: 10px 12px;
+            border: 1px solid #d2d2d7;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .import-confirm {
+            background-color: #000;
+            color: white;
+            border-color: #000;
+        }
+
+        .import-confirm:hover {
+            background-color: #333;
+        }
+
+        .import-cancel {
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            border-color: #666;
+        }
+
+        .import-cancel:hover {
+            background-color: #e8e8e8;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 11px;
+            color: #86868b;
+            padding: 16px 0;
+            border-top: 1px solid #e8e8e8;
+            position: relative;
+            bottom: 0;
+        }
+        
     </style>
 </head>
 <body>
-    <div id="bg-animation"></div>
-    <img src="background.png" class="overlay-background">
 
-    <img src="logo1.png" alt="Terra Sky" class="top-center-logo">
-    <img src="Win1000AED.png" alt="Titre" class="corner-image" id="top-left">
-    <img src="Win1000AED.png" alt="Titre" class="corner-image" id="top-right">
-    <img src="Win1000AED.png" alt="Titre" class="corner-image" id="bottom-left">
-    <img src="Win1000AED.png" alt="Titre" class="corner-image" id="bottom-right">
-    <div id="confetti-animation-1" class="confetti-container"></div>
-    <div id="confetti-animation-2" class="confetti-container"></div>
-    <div id="confetti-animation-3" class="confetti-container"></div>
-    <div id="confetti-animation-4" class="confetti-container"></div>
-    <div class="main-container">
-        <div class="wheel-container">
-            <div class="ticker"></div>
-            <div class="wheel-center"></div>
-            <div id="glow-animation-2"></div>
-            <div id="glow-animation"></div>
-            <div class="wheel" id="wheel"></div>
-            <div id="text-container"></div>
+    <div class="container">
+        <h1>TABLEAU DE BORD ADMINISTRATEUR</h1>
+
+        <div class="dashboard-grid">
+            <div class="card session-card">
+                <h2>Session de Jeu</h2>
+                <button id="create-session-btn">Créer une nouvelle session</button>
+                <div id="session-links">
+                    <div class="link-group">
+                        <label for="inscription-link">Lien d'inscription (à partager aux participants)</label>
+                        <div class="link-input-row">
+                            <input type="text" id="inscription-link" readonly>
+                            <button class="copy-btn" data-target="inscription-link">Copier</button>
+                        </div>
+                    </div>
+                    <div class="link-group">
+                        <label for="wheel-link">Lien de la roue (à partager sur Zoom)</label>
+                        <div class="link-input-row">
+                            <input type="text" id="wheel-link" readonly>
+                            <button class="copy-btn" data-target="wheel-link">Copier</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card participants-card">
+                <div class="participants-header">
+                    <h2>Participants Inscrits (<span id="participant-count">0</span>)</h2>
+                    <div class="participants-actions">
+                        <button class="download-btn" id="download-btn" disabled>Télécharger CSV</button>
+                    </div>
+                </div>
+                <ul id="participant-list">
+                    <!-- Les participants apparaîtront ici -->
+                </ul>
+                
+                <div class="import-section">
+                    <button class="import-btn" id="import-btn">Importer une liste de participants</button>
+                    <textarea id="participant-import" placeholder="Entrez un nom par ligne :&#10;Nom 1&#10;Nom 2&#10;Nom 3&#10;..."></textarea>
+                    <div class="import-actions">
+                        <button class="import-confirm" id="import-confirm">Confirmer</button>
+                        <button class="import-cancel" id="import-cancel">Annuler</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card winners-card">
+                <h2>Gagnants Sélectionnés</h2>
+                <div class="winner-slot" id="winner-slot-0"><span class="label">1er Gagnant :</span><span class="name"></span></div>
+                <div class="winner-slot" id="winner-slot-1"><span class="label">2ème Gagnant :</span><span class="name"></span></div>
+                <div class="winner-slot" id="winner-slot-2"><span class="label">3ème Gagnant :</span><span class="name"></span></div>
+                <div class="winner-slot" id="winner-slot-3"><span class="label">4ème Gagnant :</span><span class="name"></span></div>
+            </div>
         </div>
-        <button id="spin-button" disabled>Chargement...</button>
     </div>
-    <div id="winner-popup" class="winner-popup">
-        <div class="winner-content">
-            <div id="winner-name-display" class="winner-name"></div>
-            <div class="prize-text">YOU WIN 1000 AED !</div>
-        </div>
+
+    <div class="footer">
+        Designed and Developed by Osmaweb, a subsidiary of Opik Corporation – Alessio Opik
     </div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
-    
+
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-      const firebaseConfig = {
-        apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
-        authDomain: "roue-de-la-chance-c0f6a.firebaseapp.com",
-        projectId: "roue-de-la-chance-c0f6a",
-        storageBucket: "roue-de-la-chance-c0f6a.appspot.com",
-        messagingSenderId: "491916732335",
-        appId: "1:491916732335:web:7a9765b2720d995583315a"
-      };
-      const app = initializeApp(firebaseConfig);
-      window.db = getFirestore(app);
-      window.firestoreFunctions = { collection, getDocs, doc, getDoc };
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
+            authDomain: "roue-de-la-chance-c0f6a.firebaseapp.com",
+            projectId: "roue-de-la-chance-c0f6a",
+            storageBucket: "roue-de-la-chance-c0f6a.appspot.com",
+            messagingSenderId: "491916732335",
+            appId: "1:491916732335:web:7a9765b2720d995583315a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.firestoreFunctions = { doc, setDoc, onSnapshot, collection, addDoc, deleteDoc };
     </script>
 
     <script>
-        let participants = [];
-        let predefinedWinners = [];
-        let randomMode = false;
-        let currentWinnerIndex = 0;
-        const segmentColors = ["#30b9aa", "#4ac2b7", "#64ccc4", "#7ed5d1"];
-        const spinDuration = 10;
-        const totalSpins = 6;
-
-        const wheelDiv = document.getElementById('wheel');
-        const textContainer = document.getElementById('text-container');
-        const spinButton = document.getElementById('spin-button');
-        const confettiDiv1 = document.getElementById('confetti-animation-1'), confettiDiv2 = document.getElementById('confetti-animation-2'), confettiDiv3 = document.getElementById('confetti-animation-3'), confettiDiv4 = document.getElementById('confetti-animation-4');
-        const winnerPopup = document.getElementById('winner-popup');
-        const winnerNameDisplay = document.getElementById('winner-name-display');
-
-        const spinSound = new Howl({ src: ['song1.mp3'] });
-        const winSound = new Howl({ src: ['song2.mp3'] });
+        const createSessionBtn = document.getElementById('create-session-btn');
+        const sessionLinksDiv = document.getElementById('session-links');
+        const inscriptionLinkInput = document.getElementById('inscription-link');
+        const wheelLinkInput = document.getElementById('wheel-link');
+        const participantList = document.getElementById('participant-list');
+        const participantCountSpan = document.getElementById('participant-count');
+        const copyBtns = document.querySelectorAll('.copy-btn');
+        const importBtn = document.getElementById('import-btn');
+        const participantImport = document.getElementById('participant-import');
+        const importActions = document.querySelector('.import-actions');
+        const importConfirm = document.getElementById('import-confirm');
+        const importCancel = document.getElementById('import-cancel');
+        const downloadBtn = document.getElementById('download-btn');
+        const winnerSlotsUI = [
+            document.querySelector('#winner-slot-0 .name'),
+            document.querySelector('#winner-slot-1 .name'),
+            document.querySelector('#winner-slot-2 .name'),
+            document.querySelector('#winner-slot-3 .name')
+        ];
         
-        const bgAnimation = lottie.loadAnimation({ container: document.getElementById('bg-animation'), renderer: 'svg', loop: true, autoplay: true, path: 'fond.json', rendererSettings: { preserveAspectRatio: 'xMidYMid slice' } });
-        const glowAnimation = lottie.loadAnimation({ container: document.getElementById('glow-animation'), renderer: 'canvas', loop: true, autoplay: true, path: 'lueur.json', rendererSettings: { assetsPath: 'images/' } });
-        const glowAnimation2 = lottie.loadAnimation({ container: document.getElementById('glow-animation-2'), renderer: 'canvas', loop: true, autoplay: true, path: 'lueur2.json', rendererSettings: { assetsPath: 'images/' } });
-        const confettiAnimation1 = lottie.loadAnimation({ container: confettiDiv1, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
-        const confettiAnimation2 = lottie.loadAnimation({ container: confettiDiv2, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
-        const confettiAnimation3 = lottie.loadAnimation({ container: confettiDiv3, renderer: 'svg', loop: false, autoplay: false, path: 'confettis2.json' });
-        const confettiAnimation4 = lottie.loadAnimation({ container: confettiDiv4, renderer: 'svg', loop: false, autoplay: false, path: 'confettis2.json' });
-        confettiAnimation2.setDirection(-1); 
-        confettiAnimation4.setDirection(-1);
+        let participants = [];
+        let winnerSlots = [null, null, null, null];
+        let currentSessionId = null;
+        let unsubscribe = null;
+        let randomMode = false;
 
-        async function setupGame() {
-            spinButton.textContent = "SPIN !";
-            const urlParams = new URLSearchParams(window.location.search);
-            const sessionId = urlParams.get('session');
+        createSessionBtn.addEventListener('click', async () => {
+            currentSessionId = `session-${Date.now().toString(36)}`;
+            const baseUrl = 'https://opikcorporation.github.io/roueterrasky/';
             
-            if (!sessionId) {
-                spinButton.textContent = "Erreur: Session ID";
+            inscriptionLinkInput.value = `${baseUrl}formulaire.html?session=${currentSessionId}`;
+            wheelLinkInput.value = `${baseUrl}index.html?session=${currentSessionId}`;
+            
+            sessionLinksDiv.style.display = 'block';
+            createSessionBtn.disabled = true;
+            createSessionBtn.textContent = 'Session Créée !';
+
+            // Initialiser la session en mode aléatoire par défaut
+            randomMode = true;
+            const { db, firestoreFunctions } = window;
+            const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+            await firestoreFunctions.setDoc(sessionDocRef, { 
+                winners: [], 
+                randomMode: true 
+            });
+
+        // Fonction pour supprimer un participant
+        async function deleteParticipant(participantId, pseudo) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer le participant "${pseudo}" ?`)) {
+                return;
+            }
+
+            try {
+                const { db, firestoreFunctions } = window;
+                const participantDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId, "participants", participantId);
+                await firestoreFunctions.deleteDoc(participantDocRef);
+
+                // Supprimer le participant des gagnants s'il y est
+                const wasWinner = winnerSlots.includes(pseudo);
+                if (wasWinner) {
+                    const winnerIndex = winnerSlots.indexOf(pseudo);
+                    winnerSlots[winnerIndex] = null;
+                    updateWinnerSlotsUI();
+                    
+                    // Mettre à jour Firebase
+                    const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+                    await firestoreFunctions.setDoc(sessionDocRef, { 
+                        winners: winnerSlots, 
+                        randomMode: !winnerSlots.some(winner => winner !== null)
+                    }, { merge: true });
+                }
+            } catch (error) {
+                console.error('Erreur lors de la suppression:', error);
+                alert('Erreur lors de la suppression du participant.');
+            }
+        }
+
+            listenForParticipants(currentSessionId);
+        });
+
+        // Gestion de l'import de participants
+        importBtn.addEventListener('click', () => {
+            participantImport.style.display = 'block';
+            importActions.style.display = 'flex';
+            importBtn.style.display = 'none';
+        });
+
+        importCancel.addEventListener('click', () => {
+            participantImport.style.display = 'none';
+            importActions.style.display = 'none';
+            importBtn.style.display = 'block';
+            participantImport.value = '';
+        });
+
+        importConfirm.addEventListener('click', async () => {
+            if (!currentSessionId) {
+                alert('Veuillez d\'abord créer une session.');
+                return;
+            }
+
+            const names = participantImport.value
+                .split('\n')
+                .map(name => name.trim())
+                .filter(name => name.length > 0);
+
+            if (names.length === 0) {
+                alert('Veuillez entrer au moins un nom.');
                 return;
             }
 
             const { db, firestoreFunctions } = window;
-            const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
-            const participantsSnapshot = await firestoreFunctions.getDocs(participantsRef);
-            participants = participantsSnapshot.docs.map(doc => doc.data().pseudo);
+            const participantsRef = firestoreFunctions.collection(db, "sessions", currentSessionId, "participants");
 
-            const sessionDocRef = firestoreFunctions.doc(db, "sessions", sessionId);
-            const sessionDoc = await firestoreFunctions.getDoc(sessionDocRef);
-            if (sessionDoc.exists()) {
-                const sessionData = sessionDoc.data();
-                predefinedWinners = (sessionData.winners || []).filter(w => w !== null);
-                randomMode = sessionData.randomMode || false;
-            }
-            
-            if (participants.length > 0) {
-                createWheel();
-                spinButton.disabled = false;
-            } else {
-                spinButton.textContent = "Pas de participants";
-            }
-        }
-
-        function createWheel() {
-            wheelDiv.innerHTML = '';
-            textContainer.innerHTML = '';
-            const numSegments = participants.length;
-            const anglePerSegment = 360 / numSegments;
-            const svgNS = "http://www.w3.org/2000/svg";
-            const svg = document.createElementNS(svgNS, "svg");
-            svg.setAttribute("viewBox", "0 0 500 500");
-            
-            participants.forEach((name, i) => {
-                const startAngle = i * anglePerSegment;
-                const endAngle = startAngle + anglePerSegment;
-                
-                // Création du segment coloré
-                const path = document.createElementNS(svgNS, "path");
-                const x1 = 250 + 250 * Math.cos(Math.PI * startAngle / 180), y1 = 250 + 250 * Math.sin(Math.PI * startAngle / 180);
-                const x2 = 250 + 250 * Math.cos(Math.PI * endAngle / 180), y2 = 250 + 250 * Math.sin(Math.PI * endAngle / 180);
-                path.setAttribute("d", `M250,250 L${x1},${y1} A250,250 0 0,1 ${x2},${y2} z`);
-                path.setAttribute("fill", segmentColors[i % segmentColors.length]);
-                svg.appendChild(path);
-            });
-            
-            // Création d'un groupe SVG pour les textes par-dessus
-            const textGroup = document.createElementNS(svgNS, "g");
-            
-            participants.forEach((name, i) => {
-                const startAngle = i * anglePerSegment;
-                const midAngle = startAngle + anglePerSegment / 2;
-                
-                // Création du chemin radial pour le texte (du centre vers l'extérieur)
-                const textPathElement = document.createElementNS(svgNS, "path");
-                const pathId = `textpath-${i}`;
-                
-                // Ligne radiale du centre vers l'extérieur au milieu du segment
-                const innerRadius = 70; // Distance du centre noir
-                const outerRadius = 220; // Avant le bord de la roue
-                const innerX = 250 + innerRadius * Math.cos(Math.PI * midAngle / 180);
-                const innerY = 250 + innerRadius * Math.sin(Math.PI * midAngle / 180);
-                const outerX = 250 + outerRadius * Math.cos(Math.PI * midAngle / 180);
-                const outerY = 250 + outerRadius * Math.sin(Math.PI * midAngle / 180);
-                
-                textPathElement.setAttribute("id", pathId);
-                textPathElement.setAttribute("d", `M${innerX},${innerY} L${outerX},${outerY}`);
-                textPathElement.setAttribute("fill", "none");
-                textPathElement.setAttribute("stroke", "none");
-                
-                // Ajout du chemin aux définitions
-                let defs = svg.querySelector("defs");
-                if (!defs) {
-                    defs = document.createElementNS(svgNS, "defs");
-                    svg.appendChild(defs);
+            try {
+                for (const name of names) {
+                    await firestoreFunctions.addDoc(participantsRef, {
+                        fullname: name,
+                        pseudo: name,
+                        pseudo_lowercase: name.toLowerCase(),
+                        whatsapp: 'N/A',
+                        timestamp: new Date(),
+                        imported: true
+                    });
                 }
-                defs.appendChild(textPathElement);
-                
-                // Création du texte qui suit le chemin radial
-                const textElement = document.createElementNS(svgNS, "text");
-                const textPath = document.createElementNS(svgNS, "textPath");
-                
-                const truncatedName = name.length > 10 ? name.substring(0, 8) + '...' : name;
-                textPath.setAttribute("href", `#${pathId}`);
-                textPath.setAttribute("startOffset", "50%"); // Centré sur la ligne radiale
-                textPath.setAttribute("text-anchor", "middle");
-                textPath.textContent = truncatedName;
-                
-                textElement.appendChild(textPath);
-                textElement.setAttribute("fill", "#fff");
-                textElement.setAttribute("font-family", "Poppins, sans-serif");
-                textElement.setAttribute("font-size", "12");
-                textElement.setAttribute("font-weight", "700");
-                
-                textGroup.appendChild(textElement);
-            });
-            
-            svg.appendChild(textGroup);
-            wheelDiv.appendChild(svg);
-        }
-        
-        let isSpinning = false;
-        spinButton.addEventListener('click', () => {
-            if (isSpinning) return;
 
-            let winnerName;
-            
-            // Mode aléatoire ou pas de gagnants prédéfinis ou gagnants épuisés
-            if (randomMode || predefinedWinners.length === 0 || currentWinnerIndex >= predefinedWinners.length) {
-                winnerName = participants[Math.floor(Math.random() * participants.length)];
-            } else {
-                // Mode gagnants prédéfinis
-                winnerName = predefinedWinners[currentWinnerIndex];
-                currentWinnerIndex++;
+                participantImport.style.display = 'none';
+                importActions.style.display = 'none';
+                importBtn.style.display = 'block';
+                participantImport.value = '';
+                
+                alert(`${names.length} participants importés avec succès !`);
+            } catch (error) {
+                console.error('Erreur lors de l\'import:', error);
+                alert('Erreur lors de l\'import des participants.');
             }
+        });
 
-            isSpinning = true; 
-            spinButton.disabled = true;
-            const winnerIndexOnWheel = participants.indexOf(winnerName);
+        copyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetInput = document.getElementById(btn.dataset.target);
+                targetInput.select();
+                document.execCommand('copy');
+                btn.textContent = 'Copié !';
+                setTimeout(() => { btn.textContent = 'Copier'; }, 2000);
+            });
+        });
 
-            if (winnerIndexOnWheel === -1) {
-                alert(`Erreur : Gagnant "${winnerName}" non trouvé sur la roue.`);
-                isSpinning = false; 
-                spinButton.disabled = false; 
+        // Bouton de téléchargement CSV
+        downloadBtn.addEventListener('click', () => {
+            if (participants.length === 0) {
+                alert('Aucun participant à télécharger.');
                 return;
             }
 
-            // Calcul d'alignement curseur
-            const anglePerSegment = 360 / participants.length;
-            const winnerAngle = (winnerIndexOnWheel * anglePerSegment) + (anglePerSegment / 2);
-            const targetRotation = -(winnerAngle - 270);
-
-            const currentRotation = gsap.getProperty(wheelDiv, "rotation") || 0;
-            const finalRotation = currentRotation + (360 * totalSpins) + targetRotation;
+            // Créer le contenu CSV
+            let csvContent = "Nom Complet,Pseudo,Numéro WhatsApp,Date d'inscription,Type\n";
             
-            spinSound.play();
-            gsap.to(wheelDiv, {
-                rotation: finalRotation, 
-                duration: spinDuration, 
-                ease: "power4.out",
-                onComplete: () => {
-                    spinSound.stop();
-                    isSpinning = false; 
-                    announceWinner(winnerName);
+            participants.forEach(participant => {
+                const fullname = participant.fullname || 'N/A';
+                const pseudo = participant.pseudo || 'N/A';
+                const whatsapp = participant.whatsapp || 'N/A';
+                const date = participant.timestamp ? new Date(participant.timestamp.seconds * 1000).toLocaleDateString('fr-FR') : 'N/A';
+                const type = participant.imported ? 'Importé' : 'Formulaire';
+                
+                csvContent += `"${fullname}","${pseudo}","${whatsapp}","${date}","${type}"\n`;
+            });
+
+            // Créer et télécharger le fichier
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `participants_${currentSessionId}_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        function listenForParticipants(sessionId) {
+            if (unsubscribe) unsubscribe();
+            
+            const { db, firestoreFunctions } = window;
+            const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
+
+            unsubscribe = firestoreFunctions.onSnapshot(participantsRef, (snapshot) => {
+                participants = [];
+                participantList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const participantData = doc.data();
+                    participantData.id = doc.id; // Stocker l'ID du document
+                    participants.push(participantData);
+                    
+                    const li = document.createElement('li');
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'participant-name';
+                    nameSpan.textContent = participantData.pseudo;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.textContent = '✕';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteParticipant(doc.id, participantData.pseudo);
+                    };
+                    
+                    li.appendChild(nameSpan);
+                    li.appendChild(deleteBtn);
+                    li.dataset.pseudo = participantData.pseudo;
+                    participantList.appendChild(li);
+                });
+                participantCountSpan.textContent = participants.length;
+                
+                // Activer le bouton de téléchargement si il y a des participants
+                downloadBtn.disabled = participants.length === 0;
+                
+                updateSelectedState();
+            });
+        }
+        
+        participantList.addEventListener('click', async (event) => {
+            if (event.target && event.target.tagName === 'LI') {
+                const selectedPseudo = event.target.dataset.pseudo;
+                const isAlreadyWinner = winnerSlots.includes(selectedPseudo);
+
+                if (isAlreadyWinner) {
+                    const winnerIndex = winnerSlots.indexOf(selectedPseudo);
+                    winnerSlots[winnerIndex] = null;
+                } else {
+                    const emptySlotIndex = winnerSlots.indexOf(null);
+                    if (emptySlotIndex !== -1) {
+                        winnerSlots[emptySlotIndex] = selectedPseudo;
+                    } else {
+                        alert("Toutes les places de gagnant sont déjà sélectionnées.");
+                        return;
+                    }
+                }
+
+                // Vérifier si on a des gagnants prédéfinis
+                const hasWinners = winnerSlots.some(winner => winner !== null);
+                randomMode = !hasWinners;
+
+                updateWinnerSlotsUI();
+                updateSelectedState();
+                
+                const { db, firestoreFunctions } = window;
+                const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+                await firestoreFunctions.setDoc(sessionDocRef, { 
+                    winners: winnerSlots, 
+                    randomMode: randomMode 
+                }, { merge: true });
+            }
+        });
+        
+        function updateWinnerSlotsUI() {
+            winnerSlots.forEach((pseudo, index) => {
+                const slotElement = document.getElementById(`winner-slot-${index}`);
+                const nameElement = winnerSlotsUI[index];
+                if (pseudo) {
+                    nameElement.textContent = pseudo;
+                    slotElement.classList.add('filled');
+                } else {
+                    nameElement.textContent = '';
+                    slotElement.classList.remove('filled');
                 }
             });
-        });
-
-        function announceWinner(winnerName) {
-            winSound.play();
-            winnerNameDisplay.textContent = winnerName;
-            winnerPopup.style.display = 'flex';
-            confettiDiv1.style.display = 'block'; confettiAnimation1.goToAndPlay(0);
-            confettiDiv3.style.display = 'block'; confettiAnimation3.goToAndPlay(0);
-            setTimeout(() => { confettiDiv2.style.display = 'block'; confettiAnimation2.goToAndPlay(0); }, 300);
-            setTimeout(() => { confettiDiv4.style.display = 'block'; confettiAnimation4.goToAndPlay(0); }, 450);
         }
 
-        winnerPopup.addEventListener('click', () => {
-            winnerPopup.style.display = 'none';
-            confettiDiv1.style.display = 'none'; confettiDiv2.style.display = 'none';
-            confettiDiv3.style.display = 'none'; confettiDiv4.style.display = 'none';
-            
-            // Remise à zéro de la rotation de la roue pour le prochain spin
-            gsap.set(wheelDiv, { rotation: 0 });
-            
-            // Le bouton reste toujours activé pour permettre des spins illimités
-            spinButton.disabled = false;
-        });
-
-        function checkFirebaseReady() {
-            if (window.db && window.firestoreFunctions) {
-                setupGame();
-            } else {
-                setTimeout(checkFirebaseReady, 50);
-            }
+        function updateSelectedState() {
+            const listItems = participantList.querySelectorAll('li');
+            listItems.forEach(li => {
+                if (winnerSlots.includes(li.dataset.pseudo)) {
+                    li.classList.add('selected');
+                } else {
+                    li.classList.remove('selected');
+                }
+            });
         }
-        checkFirebaseReady();
+
     </script>
 </body>
 </html>
