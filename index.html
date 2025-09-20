@@ -152,7 +152,7 @@
                 path.setAttribute("fill", segmentColors[i % segmentColors.length]);
                 svg.appendChild(path);
                 
-                // --- POSITIONNEMENT CORRIGÉ DU TEXTE HORIZONTALEMENT ---
+                // --- POSITIONNEMENT RADIAL DU TEXTE ---
                 const textAngle = startAngle + anglePerSegment / 2;
                 const textDiv = document.createElement('div');
                 textDiv.className = 'participant-text';
@@ -163,15 +163,15 @@
                 
                 textDiv.appendChild(textSpan);
                 
-                // Position du texte au milieu du segment, à mi-distance du centre
-                const textRadius = 130; // Distance du centre
+                // Position du texte au milieu du segment, orientation radiale
+                const textRadius = 120; // Distance du centre
                 const textX = textRadius * Math.cos((textAngle - 90) * Math.PI / 180);
                 const textY = textRadius * Math.sin((textAngle - 90) * Math.PI / 180);
                 
-                // Positionnement et rotation pour que le texte soit horizontal dans le segment
+                // Positionnement avec rotation radiale (du centre vers l'extérieur)
                 textDiv.style.left = `calc(50% + ${textX}px)`;
                 textDiv.style.top = `calc(50% + ${textY}px)`;
-                textDiv.style.transform = `translate(-50%, -50%) rotate(${textAngle}deg)`;
+                textDiv.style.transform = `translate(-50%, -50%) rotate(${textAngle - 90}deg)`;
                 
                 textContainer.appendChild(textDiv);
             });
