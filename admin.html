@@ -16,6 +16,8 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
+            min-height: 100vh;
+            padding-bottom: 80px;
         }
 
         h1 {
@@ -24,7 +26,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin: 0 0 30px 0;
-            text-align: center;
+            text-align: left;
         }
 
         .dashboard-grid {
@@ -115,8 +117,8 @@
         }
         .copy-btn {
             padding: 10px 16px;
-            border: 1px solid #007aff;
-            background-color: #007aff;
+            border: 1px solid #333;
+            background-color: #000;
             color: white;
             border-radius: 8px;
             cursor: pointer;
@@ -126,7 +128,7 @@
             min-width: 70px;
         }
         .copy-btn:hover { 
-            background-color: #0056d6;
+            background-color: #333;
             transform: translateY(-1px);
         }
 
@@ -144,7 +146,7 @@
 
         .download-btn {
             padding: 8px 12px;
-            background-color: #28a745;
+            background-color: #666;
             color: white;
             border: none;
             border-radius: 6px;
@@ -155,7 +157,7 @@
         }
 
         .download-btn:hover {
-            background-color: #218838;
+            background-color: #555;
             transform: translateY(-1px);
         }
 
@@ -181,6 +183,9 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         #participant-list li:last-child {
             border-bottom: none;
@@ -189,9 +194,33 @@
             background-color: #f5f5f7;
         }
         #participant-list li.selected {
-            background-color: #007aff;
+            background-color: #333;
             color: white;
             font-weight: 600;
+        }
+
+        .participant-name {
+            flex: 1;
+        }
+
+        .delete-btn {
+            padding: 4px 8px;
+            background-color: #666;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        #participant-list li:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background-color: #888;
         }
 
         .winner-slot {
@@ -227,9 +256,9 @@
             padding: 8px 12px;
             font-size: 13px;
             font-weight: 500;
-            color: #007aff;
-            background-color: #f0f8ff;
-            border: 1px solid #007aff;
+            color: #333;
+            background-color: #f5f5f7;
+            border: 1px solid #333;
             border-radius: 8px;
             cursor: pointer;
             margin-bottom: 8px;
@@ -237,7 +266,7 @@
         }
 
         .import-btn:hover {
-            background-color: #e5f2ff;
+            background-color: #e8e8e8;
             transform: translateY(-1px);
         }
 
@@ -272,18 +301,19 @@
         }
 
         .import-confirm {
-            background-color: #007aff;
+            background-color: #000;
             color: white;
-            border-color: #007aff;
+            border-color: #000;
         }
 
         .import-confirm:hover {
-            background-color: #0056d6;
+            background-color: #333;
         }
 
         .import-cancel {
             background-color: #f5f5f7;
             color: #1d1d1f;
+            border-color: #666;
         }
 
         .import-cancel:hover {
@@ -297,6 +327,8 @@
             color: #86868b;
             padding: 16px 0;
             border-top: 1px solid #e8e8e8;
+            position: relative;
+            bottom: 0;
         }
         
     </style>
@@ -365,7 +397,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
@@ -380,7 +412,7 @@
         const db = getFirestore(app);
 
         window.db = db;
-        window.firestoreFunctions = { doc, setDoc, onSnapshot, collection, addDoc };
+        window.firestoreFunctions = { doc, setDoc, onSnapshot, collection, addDoc, deleteDoc };
     </script>
 
     <script>
@@ -429,6 +461,37 @@
                 winners: [], 
                 randomMode: true 
             });
+
+        // Fonction pour supprimer un participant
+        async function deleteParticipant(participantId, pseudo) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer le participant "${pseudo}" ?`)) {
+                return;
+            }
+
+            try {
+                const { db, firestoreFunctions } = window;
+                const participantDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId, "participants", participantId);
+                await firestoreFunctions.deleteDoc(participantDocRef);
+
+                // Supprimer le participant des gagnants s'il y est
+                const wasWinner = winnerSlots.includes(pseudo);
+                if (wasWinner) {
+                    const winnerIndex = winnerSlots.indexOf(pseudo);
+                    winnerSlots[winnerIndex] = null;
+                    updateWinnerSlotsUI();
+                    
+                    // Mettre à jour Firebase
+                    const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+                    await firestoreFunctions.setDoc(sessionDocRef, { 
+                        winners: winnerSlots, 
+                        randomMode: !winnerSlots.some(winner => winner !== null)
+                    }, { merge: true });
+                }
+            } catch (error) {
+                console.error('Erreur lors de la suppression:', error);
+                alert('Erreur lors de la suppression du participant.');
+            }
+        }
 
             listenForParticipants(currentSessionId);
         });
@@ -545,10 +608,24 @@
                 participantList.innerHTML = '';
                 snapshot.forEach(doc => {
                     const participantData = doc.data();
+                    participantData.id = doc.id; // Stocker l'ID du document
                     participants.push(participantData);
                     
                     const li = document.createElement('li');
-                    li.textContent = participantData.pseudo;
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'participant-name';
+                    nameSpan.textContent = participantData.pseudo;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.textContent = '✕';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteParticipant(doc.id, participantData.pseudo);
+                    };
+                    
+                    li.appendChild(nameSpan);
+                    li.appendChild(deleteBtn);
                     li.dataset.pseudo = participantData.pseudo;
                     participantList.appendChild(li);
                 });
@@ -562,8 +639,19 @@
         }
         
         participantList.addEventListener('click', async (event) => {
-            if (event.target && event.target.tagName === 'LI') {
-                const selectedPseudo = event.target.dataset.pseudo;
+            // Vérifier si c'est le bouton de suppression qui a été cliqué
+            if (event.target.classList.contains('delete-btn')) {
+                return; // Ne pas traiter la sélection de gagnant
+            }
+            
+            // Vérifier si c'est un élément de liste ou un enfant d'un élément de liste
+            let targetLi = event.target;
+            if (targetLi.tagName !== 'LI') {
+                targetLi = targetLi.closest('li');
+            }
+            
+            if (targetLi && targetLi.tagName === 'LI') {
+                const selectedPseudo = targetLi.dataset.pseudo;
                 const isAlreadyWinner = winnerSlots.includes(selectedPseudo);
 
                 if (isAlreadyWinner) {
