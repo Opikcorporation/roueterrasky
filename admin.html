@@ -62,13 +62,11 @@
             margin: 0 0 20px 0;
             padding-bottom: 15px;
             border-bottom: 1px solid #e8e8e8;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         #create-session-btn {
-            padding: 14px 28px;
+            width: 100%;
+            padding: 14px;
             font-size: 17px;
             font-weight: 600;
             color: #ffffff;
@@ -78,44 +76,45 @@
             cursor: pointer;
             transition: background-color 0.2s ease-in-out;
         }
-        #create-session-btn:hover { background-color: #333333; }
+        #create-session-btn:hover {
+            background-color: #333333;
+        }
 
         #session-links {
             margin-top: 20px;
-            display: none;
-            grid-template-columns: 1fr auto;
-            row-gap: 15px;
-            column-gap: 10px;
-            align-items: center;
+            display: none; 
         }
-        #session-links label {
-            grid-column: 1 / -1;
-            margin-bottom: -5px;
+
+        .link-group {
+            margin-bottom: 15px;
+        }
+        .link-group label {
+            display: block;
+            margin-bottom: 8px;
             font-weight: normal;
             color: #86868b;
             font-size: 14px;
         }
-        #session-links input {
-            width: 100%;
-            padding: 12px;
+        .link-group input {
+            width: calc(100% - 100px);
+            padding: 10px 12px;
             background-color: #f5f5f7;
             border: 1px solid #d2d2d7;
             border-radius: 8px;
             color: #1d1d1f;
             font-size: 14px;
             font-family: inherit;
-            box-sizing: border-box;
         }
-        #session-links button {
-            width: 90px;
-            padding: 12px;
+        .copy-btn {
+            width: 80px;
+            padding: 10px 12px;
+            margin-left: 10px;
             border: 1px solid #d2d2d7;
             background-color: #fff;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 600;
         }
-        #session-links button:hover { background-color: #f0f0f0; }
+        .copy-btn:hover { background-color: #f5f5f7; }
 
         #participant-list {
             list-style: none;
@@ -130,7 +129,9 @@
             cursor: pointer;
             transition: background-color 0.2s ease;
         }
-        #participant-list li:hover { background-color: #f5f5f7; }
+        #participant-list li:hover {
+            background-color: #f5f5f7;
+        }
         #participant-list li.selected {
             background-color: #007aff;
             color: white;
@@ -155,29 +156,34 @@
             border-color: #007aff;
             font-weight: 600;
         }
+        
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>TABLEAU DE BORD ADMINISTRATEUR</h1>
+
         <div class="dashboard-grid">
             <div class="card session-card">
                 <h2>Session de Jeu</h2>
                 <button id="create-session-btn">Créer une nouvelle session</button>
                 <div id="session-links">
-                    <label for="inscription-link">Lien d'inscription</label>
-                    <input type="text" id="inscription-link" readonly>
-                    <button class="copy-btn" data-target="inscription-link">Copier</button>
-                    
-                    <label for="wheel-link">Lien de la roue</label>
-                    <input type="text" id="wheel-link" readonly>
-                    <button class="copy-btn" data-target="wheel-link">Copier</button>
+                    <div class="link-group">
+                        <label for="inscription-link">Lien d'inscription (à partager aux participants)</label>
+                        <input type="text" id="inscription-link" readonly>
+                        <button class="copy-btn" data-target="inscription-link">Copier</button>
+                    </div>
+                    <div class="link-group">
+                        <label for="wheel-link">Lien de la roue (à partager sur Zoom)</label>
+                        <input type="text" id="wheel-link" readonly>
+                        <button class="copy-btn" data-target="wheel-link">Copier</button>
+                    </div>
                 </div>
             </div>
 
             <div class="card participants-card">
-                <h2>Participants (<span id="participant-count">0</span>)</h2>
+                <h2>Participants Inscrits (<span id="participant-count">0</span>)</h2>
                 <ul id="participant-list">
                     <!-- Les participants apparaîtront ici -->
                 </ul>
@@ -240,7 +246,7 @@
             inscriptionLinkInput.value = `${baseUrl}formulaire.html?session=${currentSessionId}`;
             wheelLinkInput.value = `${baseUrl}?session=${currentSessionId}`;
             
-            sessionLinksDiv.style.display = 'grid';
+            sessionLinksDiv.style.display = 'block';
             createSessionBtn.disabled = true;
             createSessionBtn.textContent = 'Session Créée !';
 
