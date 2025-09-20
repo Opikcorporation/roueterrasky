@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord Administrateur</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Avenir Book", "Avenir", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 30px 0;
+            text-align: left;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #d2d2d7;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .session-card {
+            grid-column: 1 / -1;
+        }
+        
+        .participants-card {
+            grid-column: 1 / 2;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .winners-card {
+            grid-column: 2 / 3;
+        }
+
+        .card h2 {
+            font-size: 20px;
+            font-weight: 900;
+            margin: 0 0 16px 0;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        #create-session-btn {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #000000;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        #create-session-btn:hover {
+            background-color: #333333;
+            transform: translateY(-1px);
+        }
+
+        #session-links {
+            margin-top: 16px;
+            display: none; 
+        }
+
+        .link-group {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .link-group label {
+            font-weight: 500;
+            color: #86868b;
+            font-size: 13px;
+        }
+        .link-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+        .link-group input {
+            flex: 1;
+            padding: 10px 12px;
+            background-color: #f5f5f7;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            color: #1d1d1f;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .copy-btn {
+            padding: 10px 16px;
+            border: 1px solid #333;
+            background-color: #000;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            min-width: 70px;
+        }
+        .copy-btn:hover { 
+            background-color: #333;
+            transform: translateY(-1px);
+        }
+
+        .participants-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .participants-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .download-btn {
+            padding: 8px 12px;
+            background-color: #666;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background-color: #555;
+            transform: translateY(-1px);
+        }
+
+        .download-btn:disabled {
+            background-color: #d2d2d7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #participant-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            min-height: 200px;
+            max-height: none;
+        }
+        #participant-list li {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e8e8e8;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #participant-list li:last-child {
+            border-bottom: none;
+        }
+        #participant-list li:hover {
+            background-color: #f5f5f7;
+        }
+
+        .participant-name {
+            flex: 1;
+        }
+
+        .participant-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        #participant-list li:hover .participant-actions {
+            opacity: 1;
+        }
+
+        .winner-btn {
+            width: 24px;
+            height: 24px;
+            background-color: transparent;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            padding: 0;
+        }
+
+        .winner-btn:hover {
+            border-color: #666;
+            background-color: #f5f5f7;
+        }
+
+        .winner-btn.active {
+            background-color: #333;
+            border-color: #333;
+        }
+
+        .winner-btn.active svg {
+            fill: white;
+        }
+
+        .delete-btn {
+            width: 24px;
+            height: 24px;
+            background-color: transparent;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            color: #666;
+            padding: 0;
+        }
+
+        .delete-btn:hover {
+            border-color: #888;
+            background-color: #f5f5f7;
+            color: #888;
+        }
+
+        .winner-slot {
+            background-color: #f5f5f7;
+            border: 1px dashed #d2d2d7;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+        .winner-slot .label {
+            color: #86868b;
+            font-size: 13px;
+            margin-right: 8px;
+            font-weight: 500;
+        }
+        .winner-slot.filled {
+            background-color: #e5f2ff;
+            border-color: #007aff;
+            border-style: solid;
+            font-weight: 600;
+        }
+
+        .import-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e8e8e8;
+        }
+
+        .import-btn {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            background-color: #f5f5f7;
+            border: 1px solid #333;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .import-btn:hover {
+            background-color: #e8e8e8;
+            transform: translateY(-1px);
+        }
+
+        #participant-import {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            display: none;
+            box-sizing: border-box;
+        }
+
+        .import-actions {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .import-actions button {
+            padding: 10px 12px;
+            border: 1px solid #d2d2d7;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .import-confirm {
+            background-color: #000;
+            color: white;
+            border-color: #000;
+        }
+
+        .import-confirm:hover {
+            background-color: #333;
+        }
+
+        .import-cancel {
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            border-color: #666;
+        }
+
+        .import-cancel:hover {
+            background-color: #e8e8e8;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 11px;
+            color: #86868b;
+            padding: 16px 0;
+            border-top: 1px solid #e8e8e8;
+            position: relative;
+            bottom: 0;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>TABLEAU DE BORD ADMINISTRATEUR</h1>
+
+        <div class="dashboard-grid">
+            <div class="card session-card">
+                <h2>Session de Jeu</h2>
+                <button id="create-session-btn">Créer une nouvelle session</button>
+                <div id="session-links">
+                    <div class="link-group">
+                        <label for="inscription-link">Lien d'inscription (à partager aux participants)</label>
+                        <div class="link-input-row">
+                            <input type="text" id="inscription-link" readonly>
+                            <button class="copy-btn" data-target="inscription-link">Copier</button>
+                        </div>
+                    </div>
+                    <div class="link-group">
+                        <label for="wheel-link">Lien de la roue (à partager sur Zoom)</label>
+                        <div class="link-input-row">
+                            <input type="text" id="wheel-link" readonly>
+                            <button class="copy-btn" data-target="wheel-link">Copier</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card participants-card">
+                <div class="participants-header">
+                    <h2>Participants Inscrits (<span id="participant-count">0</span>)</h2>
+                    <div class="participants-actions">
+                        <button class="download-btn" id="download-btn" disabled>Télécharger CSV</button>
+                    </div>
+                </div>
+                <ul id="participant-list">
+                    <!-- Les participants apparaîtront ici -->
+                </ul>
+                
+                <div class="import-section">
+                    <button class="import-btn" id="import-btn">Importer une liste de participants</button>
+                    <textarea id="participant-import" placeholder="Entrez un nom par ligne :&#10;Nom 1&#10;Nom 2&#10;Nom 3&#10;..."></textarea>
+                    <div class="import-actions">
+                        <button class="import-confirm" id="import-confirm">Confirmer</button>
+                        <button class="import-cancel" id="import-cancel">Annuler</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card winners-card">
+                <h2>Gagnants Sélectionnés</h2>
+                <div class="winner-slot" id="winner-slot-0"><span class="label">1er Gagnant :</span><span class="name"></span></div>
+                <div class="winner-slot" id="winner-slot-1"><span class="label">2ème Gagnant :</span><span class="name"></span></div>
+                <div class="winner-slot" id="winner-slot-2"><span class="label">3ème Gagnant :</span><span class="name"></span></div>
+                <div class="winner-slot" id="winner-slot-3"><span class="label">4ème Gagnant :</span><span class="name"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Designed and Developed by Osmaweb, a subsidiary of Opik Corporation – Alessio Opik
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
+            authDomain: "roue-de-la-chance-c0f6a.firebaseapp.com",
+            projectId: "roue-de-la-chance-c0f6a",
+            storageBucket: "roue-de-la-chance-c0f6a.appspot.com",
+            messagingSenderId: "491916732335",
+            appId: "1:491916732335:web:7a9765b2720d995583315a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.firestoreFunctions = { doc, setDoc, onSnapshot, collection, addDoc, deleteDoc };
+    </script>
+
+    <script>
+        const createSessionBtn = document.getElementById('create-session-btn');
+        const sessionLinksDiv = document.getElementById('session-links');
+        const inscriptionLinkInput = document.getElementById('inscription-link');
+        const wheelLinkInput = document.getElementById('wheel-link');
+        const participantList = document.getElementById('participant-list');
+        const participantCountSpan = document.getElementById('participant-count');
+        const copyBtns = document.querySelectorAll('.copy-btn');
+        const importBtn = document.getElementById('import-btn');
+        const participantImport = document.getElementById('participant-import');
+        const importActions = document.querySelector('.import-actions');
+        const importConfirm = document.getElementById('import-confirm');
+        const importCancel = document.getElementById('import-cancel');
+        const downloadBtn = document.getElementById('download-btn');
+        const winnerSlotsUI = [
+            document.querySelector('#winner-slot-0 .name'),
+            document.querySelector('#winner-slot-1 .name'),
+            document.querySelector('#winner-slot-2 .name'),
+            document.querySelector('#winner-slot-3 .name')
+        ];
+        
+        let participants = [];
+        let winnerSlots = [null, null, null, null];
+        let currentSessionId = null;
+        let unsubscribe = null;
+        let randomMode = false;
+
+        // DÉFINIR TOUTES LES FONCTIONS EN PREMIER
+        
+        // Fonction pour gérer la sélection des gagnants
+        async function toggleWinner(pseudo, buttonElement) {
+            const isAlreadyWinner = winnerSlots.includes(pseudo);
+
+            if (isAlreadyWinner) {
+                const winnerIndex = winnerSlots.indexOf(pseudo);
+                winnerSlots[winnerIndex] = null;
+                buttonElement.classList.remove('active');
+            } else {
+                const emptySlotIndex = winnerSlots.indexOf(null);
+                if (emptySlotIndex !== -1) {
+                    winnerSlots[emptySlotIndex] = pseudo;
+                    buttonElement.classList.add('active');
+                } else {
+                    alert("Toutes les places de gagnant sont déjà sélectionnées.");
+                    return;
+                }
+            }
+
+            // Vérifier si on a des gagnants prédéfinis
+            const hasWinners = winnerSlots.some(winner => winner !== null);
+            randomMode = !hasWinners;
+
+            updateWinnerSlotsUI();
+            
+            const { db, firestoreFunctions } = window;
+            const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+            await firestoreFunctions.setDoc(sessionDocRef, { 
+                winners: winnerSlots, 
+                randomMode: randomMode 
+            }, { merge: true });
+        }
+
+        // Fonction pour supprimer un participant
+        async function deleteParticipant(participantId, pseudo) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer le participant "${pseudo}" ?`)) {
+                return;
+            }
+
+            try {
+                const { db, firestoreFunctions } = window;
+                const participantDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId, "participants", participantId);
+                await firestoreFunctions.deleteDoc(participantDocRef);
+
+                // Supprimer le participant des gagnants s'il y est
+                const wasWinner = winnerSlots.includes(pseudo);
+                if (wasWinner) {
+                    const winnerIndex = winnerSlots.indexOf(pseudo);
+                    winnerSlots[winnerIndex] = null;
+                    updateWinnerSlotsUI();
+                    
+                    // Mettre à jour Firebase
+                    const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+                    await firestoreFunctions.setDoc(sessionDocRef, { 
+                        winners: winnerSlots, 
+                        randomMode: !winnerSlots.some(winner => winner !== null)
+                    }, { merge: true });
+                }
+            } catch (error) {
+                console.error('Erreur lors de la suppression:', error);
+                alert('Erreur lors de la suppression du participant.');
+            }
+        }
+
+        function updateWinnerSlotsUI() {
+            winnerSlots.forEach((pseudo, index) => {
+                const slotElement = document.getElementById(`winner-slot-${index}`);
+                const nameElement = winnerSlotsUI[index];
+                if (pseudo) {
+                    nameElement.textContent = pseudo;
+                    slotElement.classList.add('filled');
+                } else {
+                    nameElement.textContent = '';
+                    slotElement.classList.remove('filled');
+                }
+            });
+        }
+
+        function updateSelectedState() {
+            const listItems = participantList.querySelectorAll('li');
+            listItems.forEach(li => {
+                const pseudo = li.dataset.pseudo;
+                const winnerBtn = li.querySelector('.winner-btn');
+                if (winnerBtn && winnerSlots.includes(pseudo)) {
+                    winnerBtn.classList.add('active');
+                } else if (winnerBtn) {
+                    winnerBtn.classList.remove('active');
+                }
+            });
+        }
+
+        function listenForParticipants(sessionId) {
+            if (unsubscribe) unsubscribe();
+            
+            const { db, firestoreFunctions } = window;
+            const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
+
+        function listenForParticipants(sessionId) {
+            if (unsubscribe) unsubscribe();
+            
+            const { db, firestoreFunctions } = window;
+            const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
+
+            unsubscribe = firestoreFunctions.onSnapshot(participantsRef, (snapshot) => {
+                participants = [];
+                participantList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const participantData = doc.data();
+                    participantData.id = doc.id; // Stocker l'ID du document
+                    participants.push(participantData);
+                    
+                    const li = document.createElement('li');
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'participant-name';
+                    nameSpan.textContent = participantData.pseudo;
+                    
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'participant-actions';
+                    
+                    // Bouton gagnant (coupe)
+                    const winnerBtn = document.createElement('button');
+                    winnerBtn.className = 'winner-btn';
+                    winnerBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M5 16L3 14v-3c0-1.1.9-2 2-2h1V7a1 1 0 011-1h10a1 1 0 011 1v2h1c1.1 0 2 .9 2 2v3l-2 2v5H5v-5zm2 0h10v3H7v-3zm10-2V11H7v3h10zm-1-5V8H8v1h8z"/></svg>';
+                    winnerBtn.addEventListener('click', () => toggleWinner(participantData.pseudo, winnerBtn));
+                    
+                    // Bouton supprimer (croix)
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.innerHTML = '✕';
+                    deleteBtn.addEventListener('click', () => deleteParticipant(doc.id, participantData.pseudo));
+                    
+                    actionsDiv.appendChild(winnerBtn);
+                    actionsDiv.appendChild(deleteBtn);
+                    
+                    li.appendChild(nameSpan);
+                    li.appendChild(actionsDiv);
+                    li.dataset.pseudo = participantData.pseudo;
+                    participantList.appendChild(li);
+                });
+                participantCountSpan.textContent = participants.length;
+                
+                // Activer le bouton de téléchargement si il y a des participants
+                downloadBtn.disabled = participants.length === 0;
+                
+                updateSelectedState();
+            });
+        }
+
+        // MAINTENANT LES EVENT LISTENERS
+        }
+
+        createSessionBtn.addEventListener('click', async () => {
+            currentSessionId = `session-${Date.now().toString(36)}`;
+            const baseUrl = 'https://opikcorporation.github.io/roueterrasky/';
+            
+            inscriptionLinkInput.value = `${baseUrl}formulaire.html?session=${currentSessionId}`;
+            wheelLinkInput.value = `${baseUrl}index.html?session=${currentSessionId}`;
+            
+            sessionLinksDiv.style.display = 'block';
+            createSessionBtn.disabled = true;
+            createSessionBtn.textContent = 'Session Créée !';
+
+            // Initialiser la session en mode aléatoire par défaut
+            randomMode = true;
+            const { db, firestoreFunctions } = window;
+            const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+            await firestoreFunctions.setDoc(sessionDocRef, { 
+                winners: [], 
+                randomMode: true 
+            });
+
+        // Fonction pour supprimer un participant
+        async function deleteParticipant(participantId, pseudo) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer le participant "${pseudo}" ?`)) {
+                return;
+            }
+
+            try {
+                const { db, firestoreFunctions } = window;
+                const participantDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId, "participants", participantId);
+                await firestoreFunctions.deleteDoc(participantDocRef);
+
+                // Supprimer le participant des gagnants s'il y est
+                const wasWinner = winnerSlots.includes(pseudo);
+                if (wasWinner) {
+                    const winnerIndex = winnerSlots.indexOf(pseudo);
+                    winnerSlots[winnerIndex] = null;
+                    updateWinnerSlotsUI();
+                    
+                    // Mettre à jour Firebase
+                    const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+                    await firestoreFunctions.setDoc(sessionDocRef, { 
+                        winners: winnerSlots, 
+                        randomMode: !winnerSlots.some(winner => winner !== null)
+                    }, { merge: true });
+                }
+            } catch (error) {
+                console.error('Erreur lors de la suppression:', error);
+                alert('Erreur lors de la suppression du participant.');
+            }
+        }
+
+            listenForParticipants(currentSessionId);
+        });
+
+        // Gestion de l'import de participants
+        importBtn.addEventListener('click', () => {
+            participantImport.style.display = 'block';
+            importActions.style.display = 'flex';
+            importBtn.style.display = 'none';
+        });
+
+        importCancel.addEventListener('click', () => {
+            participantImport.style.display = 'none';
+            importActions.style.display = 'none';
+            importBtn.style.display = 'block';
+            participantImport.value = '';
+        });
+
+        importConfirm.addEventListener('click', async () => {
+            if (!currentSessionId) {
+                alert('Veuillez d\'abord créer une session.');
+                return;
+            }
+
+            const names = participantImport.value
+                .split('\n')
+                .map(name => name.trim())
+                .filter(name => name.length > 0);
+
+            if (names.length === 0) {
+                alert('Veuillez entrer au moins un nom.');
+                return;
+            }
+
+            const { db, firestoreFunctions } = window;
+            const participantsRef = firestoreFunctions.collection(db, "sessions", currentSessionId, "participants");
+
+            try {
+                for (const name of names) {
+                    await firestoreFunctions.addDoc(participantsRef, {
+                        fullname: name,
+                        pseudo: name,
+                        pseudo_lowercase: name.toLowerCase(),
+                        whatsapp: 'N/A',
+                        timestamp: new Date(),
+                        imported: true
+                    });
+                }
+
+                participantImport.style.display = 'none';
+                importActions.style.display = 'none';
+                importBtn.style.display = 'block';
+                participantImport.value = '';
+                
+                alert(`${names.length} participants importés avec succès !`);
+            } catch (error) {
+                console.error('Erreur lors de l\'import:', error);
+                alert('Erreur lors de l\'import des participants.');
+            }
+        });
+
+        copyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetInput = document.getElementById(btn.dataset.target);
+                targetInput.select();
+                document.execCommand('copy');
+                btn.textContent = 'Copié !';
+                setTimeout(() => { btn.textContent = 'Copier'; }, 2000);
+            });
+        });
+
+        // Bouton de téléchargement CSV
+        downloadBtn.addEventListener('click', () => {
+            if (participants.length === 0) {
+                alert('Aucun participant à télécharger.');
+                return;
+            }
+
+            // Créer le contenu CSV
+            let csvContent = "Nom Complet,Pseudo,Numéro WhatsApp,Date d'inscription,Type\n";
+            
+            participants.forEach(participant => {
+                const fullname = participant.fullname || 'N/A';
+                const pseudo = participant.pseudo || 'N/A';
+                const whatsapp = participant.whatsapp || 'N/A';
+                const date = participant.timestamp ? new Date(participant.timestamp.seconds * 1000).toLocaleDateString('fr-FR') : 'N/A';
+                const type = participant.imported ? 'Importé' : 'Formulaire';
+                
+                csvContent += `"${fullname}","${pseudo}","${whatsapp}","${date}","${type}"\n`;
+            });
+
+            // Créer et télécharger le fichier
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `participants_${currentSessionId}_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        function listenForParticipants(sessionId) {
+            if (unsubscribe) unsubscribe();
+            
+            const { db, firestoreFunctions } = window;
+            const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
+
+            unsubscribe = firestoreFunctions.onSnapshot(participantsRef, (snapshot) => {
+                participants = [];
+                participantList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const participantData = doc.data();
+                    participantData.id = doc.id; // Stocker l'ID du document
+                    participants.push(participantData);
+                    
+                    const li = document.createElement('li');
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'participant-name';
+                    nameSpan.textContent = participantData.pseudo;
+                    
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'participant-actions';
+                    
+                    // Bouton gagnant (coupe)
+                    const winnerBtn = document.createElement('button');
+                    winnerBtn.className = 'winner-btn';
+                    winnerBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M5 16L3 14v-3c0-1.1.9-2 2-2h1V7a1 1 0 011-1h10a1 1 0 011 1v2h1c1.1 0 2 .9 2 2v3l-2 2v5H5v-5zm2 0h10v3H7v-3zm10-2V11H7v3h10zm-1-5V8H8v1h8z"/></svg>';
+                    winnerBtn.addEventListener('click', () => toggleWinner(participantData.pseudo, winnerBtn));
+                    
+                    // Bouton supprimer (croix)
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.innerHTML = '✕';
+                    deleteBtn.addEventListener('click', () => deleteParticipant(doc.id, participantData.pseudo));
+                    
+                    actionsDiv.appendChild(winnerBtn);
+                    actionsDiv.appendChild(deleteBtn);
+                    
+                    li.appendChild(nameSpan);
+                    li.appendChild(actionsDiv);
+                    li.dataset.pseudo = participantData.pseudo;
+                    participantList.appendChild(li);
+                });
+                participantCountSpan.textContent = participants.length;
+                
+                // Activer le bouton de téléchargement si il y a des participants
+                downloadBtn.disabled = participants.length === 0;
+                
+                updateSelectedState();
+            });
+        }
+        
+        // Supprimer l'ancien event listener sur participantList
+        // participantList.addEventListener('click', async (event) => { ... });
+
+        // Nouvelle fonction pour gérer la sélection des gagnants
+        async function toggleWinner(pseudo, buttonElement) {
+            const isAlreadyWinner = winnerSlots.includes(pseudo);
+
+            if (isAlreadyWinner) {
+                const winnerIndex = winnerSlots.indexOf(pseudo);
+                winnerSlots[winnerIndex] = null;
+                buttonElement.classList.remove('active');
+            } else {
+                const emptySlotIndex = winnerSlots.indexOf(null);
+                if (emptySlotIndex !== -1) {
+                    winnerSlots[emptySlotIndex] = pseudo;
+                    buttonElement.classList.add('active');
+                } else {
+                    alert("Toutes les places de gagnant sont déjà sélectionnées.");
+                    return;
+                }
+            }
+
+            // Vérifier si on a des gagnants prédéfinis
+            const hasWinners = winnerSlots.some(winner => winner !== null);
+            randomMode = !hasWinners;
+
+            updateWinnerSlotsUI();
+            
+            const { db, firestoreFunctions } = window;
+            const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+            await firestoreFunctions.setDoc(sessionDocRef, { 
+                winners: winnerSlots, 
+                randomMode: randomMode 
+            }, { merge: true });
+        }
+        
+        function updateWinnerSlotsUI() {
+            winnerSlots.forEach((pseudo, index) => {
+                const slotElement = document.getElementById(`winner-slot-${index}`);
+                const nameElement = winnerSlotsUI[index];
+                if (pseudo) {
+                    nameElement.textContent = pseudo;
+                    slotElement.classList.add('filled');
+                } else {
+                    nameElement.textContent = '';
+                    slotElement.classList.remove('filled');
+                }
+            });
+        }
+
+        function updateSelectedState() {
+            const listItems = participantList.querySelectorAll('li');
+            listItems.forEach(li => {
+                const pseudo = li.dataset.pseudo;
+                const winnerBtn = li.querySelector('.winner-btn');
+                if (winnerSlots.includes(pseudo)) {
+                    winnerBtn.classList.add('active');
+                } else {
+                    winnerBtn.classList.remove('active');
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
