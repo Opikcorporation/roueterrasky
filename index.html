@@ -145,6 +145,8 @@
             participants.forEach((name, i) => {
                 const startAngle = i * anglePerSegment;
                 const endAngle = startAngle + anglePerSegment;
+                
+                // Création du segment coloré
                 const path = document.createElementNS(svgNS, "path");
                 const x1 = 250 + 250 * Math.cos(Math.PI * startAngle / 180), y1 = 250 + 250 * Math.sin(Math.PI * startAngle / 180);
                 const x2 = 250 + 250 * Math.cos(Math.PI * endAngle / 180), y2 = 250 + 250 * Math.sin(Math.PI * endAngle / 180);
@@ -152,31 +154,45 @@
                 path.setAttribute("fill", segmentColors[i % segmentColors.length]);
                 svg.appendChild(path);
                 
-                // --- POSITIONNEMENT RADIAL CORRIGÉ AVEC BONNE LOGIQUE ---
-                const textAngle = startAngle + anglePerSegment / 2;
-                const textDiv = document.createElement('div');
-                textDiv.className = 'participant-text';
+                // Création du texte avec la même logique géométrique
+                const textElement = document.createElementNS(svgNS, "text");
+                const textPath = document.createElementNS(svgNS, "textPath");
+                const defs = svg.querySelector("defs") || document.createElementNS(svgNS, "defs");
+                if (!svg.querySelector("defs")) svg.appendChild(defs);
                 
-                const textSpan = document.createElement('span');
+                // Création d'un arc invisible pour guider le texte
+                const arcPath = document.createElementNS(svgNS, "path");
+                const arcId = `arc-${i}`;
+                const midAngle = startAngle + anglePerSegment / 2;
+                const textRadius = 140; // Distance du centre pour le texte
+                
+                // Arc centré sur le milieu du segment
+                const arcStartAngle = midAngle - 10; // Arc de 20° centré
+                const arcEndAngle = midAngle + 10;
+                const arcX1 = 250 + textRadius * Math.cos(Math.PI * arcStartAngle / 180);
+                const arcY1 = 250 + textRadius * Math.sin(Math.PI * arcStartAngle / 180);
+                const arcX2 = 250 + textRadius * Math.cos(Math.PI * arcEndAngle / 180);
+                const arcY2 = 250 + textRadius * Math.sin(Math.PI * arcEndAngle / 180);
+                
+                arcPath.setAttribute("id", arcId);
+                arcPath.setAttribute("d", `M${arcX1},${arcY1} A${textRadius},${textRadius} 0 0,1 ${arcX2},${arcY2}`);
+                arcPath.setAttribute("fill", "none");
+                arcPath.setAttribute("stroke", "none");
+                defs.appendChild(arcPath);
+                
+                // Texte suivant l'arc
                 const truncatedName = name.length > 8 ? name.substring(0, 6) + '...' : name;
-                textSpan.innerText = truncatedName;
+                textPath.setAttribute("href", `#${arcId}`);
+                textPath.setAttribute("startOffset", "50%"); // Centré sur l'arc
+                textPath.setAttribute("text-anchor", "middle");
+                textPath.textContent = truncatedName;
                 
-                textDiv.appendChild(textSpan);
-                
-                // Distance fixe du centre pour tous les pseudos (cercle concentrique)
-                const textRadius = 140;
-                // Conversion de l'angle SVG vers coordonnées écran (-90° car 0° SVG = droite, mais on veut haut)
-                const angleInRadians = (textAngle - 90) * Math.PI / 180;
-                const textX = textRadius * Math.cos(angleInRadians);
-                const textY = textRadius * Math.sin(angleInRadians);
-                
-                // Positionnement concentrique avec rotation radiale
-                textDiv.style.left = `calc(50% + ${textX}px)`;
-                textDiv.style.top = `calc(50% + ${textY}px)`;
-                // Rotation pour orientation radiale (du centre vers l'extérieur)
-                textDiv.style.transform = `translate(-50%, -50%) rotate(${textAngle - 90}deg)`;
-                
-                textContainer.appendChild(textDiv);
+                textElement.appendChild(textPath);
+                textElement.setAttribute("fill", "#fff");
+                textElement.setAttribute("font-family", "Poppins, sans-serif");
+                textElement.setAttribute("font-size", "14");
+                textElement.setAttribute("font-weight", "700");
+                svg.appendChild(textElement);
             });
             
             wheelDiv.appendChild(svg);
