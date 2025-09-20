@@ -16,12 +16,34 @@
         #text-container{position:absolute;width:100%;height:100%;pointer-events:none;z-index:4;border-radius:50%}
         .participant-text{position:absolute;top:50%;left:50%;transform-origin:0 0;font-size:clamp(10px,2.5vw,16px);font-weight:700;color:#fff;text-align:center;width:150px;transform:translate(-50%,-50%)}
         #spin-button{padding:15px 40px;font-size:24px;font-weight:700;color:#fff;background:linear-gradient(45deg,#30b9aa,#2c837a);border:none;border-radius:50px;cursor:pointer;text-transform:uppercase;box-shadow:0 5px 15px rgba(0,0,0,.3);transition:all .2s ease-in-out;z-index:10;flex-shrink:0}#spin-button:hover{transform:scale(1.05);box-shadow:0 8px 25px rgba(48,185,170,.4)}#spin-button:disabled{cursor:not-allowed;background:#ccc;transform:scale(1);box-shadow:none;color:#888}.winner-popup{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.8);z-index:200;display:none;justify-content:center;align-items:center;cursor:pointer}.winner-popup .winner-content{position:relative;z-index:201;text-align:center}
-        .winner-popup .winner-name{font-size:clamp(40px,12vw,80px);font-weight:800;padding:0 20px;background:linear-gradient(45deg,#30b9aa,#2c837a);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 15px rgba(48,185,170,.3))}
+        
+        /* --- EFFET 3D RESTAURÉ SUR LE TEXTE DU GAGNANT --- */
+        .winner-popup .winner-name {
+            font-size: clamp(40px, 12vw, 80px);
+            font-weight: 800;
+            padding: 0 20px;
+            color: #30b9aa; /* Couleur de base */
+            text-shadow:
+                0px 1px 0px #2a7e75,
+                0px 2px 0px #28766d,
+                0px 3px 0px #266d65,
+                0px 4px 0px #24655e,
+                0px 5px 0px #225c56,
+                0px 6px 1px rgba(0,0,0,0.1),
+                0px 0px 5px rgba(0,0,0,0.1),
+                0px 1px 3px rgba(0,0,0,0.3),
+                0px 3px 5px rgba(0,0,0,0.2),
+                0px 5px 10px rgba(0,0,0,0.25),
+                0px 10px 10px rgba(0,0,0,0.2),
+                0px 20px 20px rgba(0,0,0,0.15);
+        }
+
         .winner-popup .prize-text{font-size:clamp(20px,6vw,40px);color:#fff;margin-top:-10px;text-shadow:0 0 10px #000,0 0 20px #000}@media (max-width:900px){.corner-image{width:180px}}@media (max-width:500px){.corner-image{width:100px;top:10px;left:10px;right:10px;bottom:10px}.top-center-logo{width:80px}}
     </style>
 </head>
 <body>
     <div id="bg-animation"></div>
+    <!-- NOM DU FICHIER CORRIGÉ -->
     <img src="background.png" class="overlay-background">
 
     <img src="logo1.png" alt="Terra Sky" class="top-center-logo">
@@ -37,7 +59,6 @@
         <div class="wheel-container">
             <div class="ticker"></div>
             <div class="wheel-center"></div>
-            <!-- Lueurs retirées -->
             <div class="wheel" id="wheel"></div>
             <div id="text-container"></div>
         </div>
@@ -52,7 +73,6 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <!-- Howler.js (pour les sons) a été retiré -->
     
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -83,11 +103,8 @@
         const confettiDiv1 = document.getElementById('confetti-animation-1'), confettiDiv2 = document.getElementById('confetti-animation-2'), confettiDiv3 = document.getElementById('confetti-animation-3'), confettiDiv4 = document.getElementById('confetti-animation-4');
         const winnerPopup = document.getElementById('winner-popup');
         const winnerNameDisplay = document.getElementById('winner-name-display');
-
-        // Sons retirés
         
         const bgAnimation = lottie.loadAnimation({ container: document.getElementById('bg-animation'), renderer: 'svg', loop: true, autoplay: true, path: 'fond.json', rendererSettings: { preserveAspectRatio: 'xMidYMid slice' } });
-        // Lueurs retirées
         const confettiAnimation1 = lottie.loadAnimation({ container: confettiDiv1, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
         const confettiAnimation2 = lottie.loadAnimation({ container: confettiDiv2, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
         const confettiAnimation3 = lottie.loadAnimation({ container: confettiDiv3, renderer: 'svg', loop: false, autoplay: false, path: 'confettis2.json' });
@@ -139,7 +156,6 @@
             
             participants.forEach((name, i) => {
                 const startAngle = i * anglePerSegment;
-                // --- BUG CORRIGÉ : endAngle était manquant ---
                 const endAngle = startAngle + anglePerSegment;
                 const path = document.createElementNS(svgNS, "path");
                 const x1 = 250 + 250 * Math.cos(Math.PI * startAngle / 180), y1 = 250 + 250 * Math.sin(Math.PI * startAngle / 180);
@@ -192,11 +208,9 @@
                     announceWinner(winnerName);
                 }
             });
-            // Pas de son
         });
 
         function announceWinner(winnerName) {
-            // Pas de son
             winnerNameDisplay.textContent = winnerName;
             winnerPopup.style.display = 'flex';
             confettiDiv1.style.display = 'block'; confettiAnimation1.goToAndPlay(0);
