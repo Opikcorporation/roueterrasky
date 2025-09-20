@@ -1,255 +1,85 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roue de la Chance</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Montserrat:wght@800&display=swap');
-        :root{--wheel-size: 450px;}body{margin:0;padding:20px;box-sizing:border-box;font-family:'Poppins',sans-serif;background-color:#1a023b;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;overflow:hidden;position:relative}#bg-animation{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1}
-        .overlay-background{position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;}
-        .top-center-logo{position:fixed;top:20px;left:50%;transform:translateX(-50%);width:150px;height:auto;z-index:20}.corner-image{position:fixed;width:250px;height:auto;z-index:10;opacity:.9}#top-left{top:20px;left:20px}#top-right{top:20px;right:20px}#bottom-left{bottom:20px;left:20px}#bottom-right{bottom:20px;right:20px}.confetti-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;display:none}#confetti-animation-1{z-index:202}#confetti-animation-2{z-index:203}#confetti-animation-3{z-index:198}#confetti-animation-4{z-index:199}#glow-animation{position:absolute;width:130%;height:130%;z-index:3}#glow-animation-2{position:absolute;width:150%;height:150%;z-index:1;opacity:.7}.main-container{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;z-index:5}.wheel-container{position:relative;width:var(--wheel-size);height:var(--wheel-size);max-width:95vw;max-height:80vh;display:flex;justify-content:center;align-items:center}
-        .wheel-container::before{content:'';position:absolute;top:-5px;left:-5px;right:-5px;bottom:-5px;border:3px solid #30b9aa;border-radius:50%;z-index:2}
-        .wheel{width:100%;aspect-ratio:1/1;border-radius:50%;position:relative;overflow:hidden;border:12px solid #000;box-shadow:0 0 25px rgba(0,0,0,.5),inset 0 0 10px rgba(0,0,0,.5);z-index:2;box-sizing:border-box;}
-        .wheel-center{position:absolute;width:28%;height:28%;background-color:#000;border-radius:50%;z-index:5;box-shadow:0 0 15px rgba(255,255,255,.2);background-image:url(icon.png);background-size:85%;background-position:center;background-repeat:no-repeat}
-        .ticker{position:absolute;top:-15px;left:50%;transform:translateX(-50%);width:60px;height:70px;background-image:url(curseur.png);background-size:contain;background-repeat:no-repeat;z-index:10;filter:drop-shadow(0 4px 3px rgba(0,0,0,.5))}
-        .wheel svg{width:100%;height:100%}
-        #text-container{position:absolute;width:100%;height:100%;pointer-events:none;z-index:4;border-radius:50%}
-        .participant-text{position:absolute;top:50%;left:50%;transform-origin:0 50%;font-size:clamp(7px,1.8vw,12px);font-weight:700;color:#fff;text-align:center;white-space:nowrap;pointer-events:none}
-        .participant-text span{display:inline-block}
-        #spin-button{padding:15px 40px;font-size:24px;font-weight:700;color:#fff;background:linear-gradient(45deg,#30b9aa,#2c837a);border:8px solid #000;border-radius:50px;cursor:pointer;text-transform:uppercase;box-shadow:0 5px 15px rgba(0,0,0,.3);transition:all .2s ease-in-out;z-index:10;flex-shrink:0}#spin-button:hover{transform:scale(1.05);box-shadow:0 8px 25px rgba(48,185,170,.4)}#spin-button:disabled{cursor:not-allowed;background:#ccc;transform:scale(1);box-shadow:none;color:#888; border-color: #999;}.winner-popup{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.8);z-index:200;display:none;justify-content:center;align-items:center;cursor:pointer}.winner-popup .winner-content{position:relative;z-index:201;text-align:center}
-        .winner-popup .winner-name{font-size:clamp(40px,12vw,80px);font-weight:800;padding:0 20px;color:#30b9aa;text-shadow:0 1px 0 #2a7e75,0 2px 0 #28766d,0 3px 0 #266d65,0 4px 0 #24655e,0 5px 0 #225c56,0 6px 1px rgba(0,0,0,.1),0 0 5px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.3),0 3px 5px rgba(0,0,0,.2),0 5px 10px rgba(0,0,0,.25),0 10px 10px rgba(0,0,0,.2),0 20px 20px rgba(0,0,0,.15)}
-        .winner-popup .prize-text{font-size:clamp(20px,6vw,40px);color:#fff;margin-top:-10px;text-shadow:0 0 10px #000,0 0 20px #000}@media (max-width:900px){.corner-image{width:180px}}@media (max-width:500px){.corner-image{width:100px;top:10px;left:10px;right:10px;bottom:10px}.top-center-logo{width:80px}}
-    </style>
-</head>
-<body>
-    <div id="bg-animation"></div>
-    <img src="background.png" class="overlay-background">
-
-    <img src="logo1.png" alt="Terra Sky" class="top-center-logo">
-    <img src="Win1000AED.png" alt="Titre" class="corner-image" id="top-left">
-    <img src="Win1000AED.png" alt="Titre" class="corner-image" id="top-right">
-    <img src="Win1000AED.png" alt="Titre" class="corner-image" id="bottom-left">
-    <img src="Win1000AED.png" alt="Titre" class="corner-image" id="bottom-right">
-    <div id="confetti-animation-1" class="confetti-container"></div>
-    <div id="confetti-animation-2" class="confetti-container"></div>
-    <div id="confetti-animation-3" class="confetti-container"></div>
-    <div id="confetti-animation-4" class="confetti-container"></div>
-    <div class="main-container">
-        <div class="wheel-container">
-            <div class="ticker"></div>
-            <div class="wheel-center"></div>
-            <div id="glow-animation-2"></div>
-            <div id="glow-animation"></div>
-            <div class="wheel" id="wheel"></div>
-            <div id="text-container"></div>
-        </div>
-        <button id="spin-button" disabled>Chargement...</button>
-    </div>
-    <div id="winner-popup" class="winner-popup">
-        <div class="winner-content">
-            <div id="winner-name-display" class="winner-name"></div>
-            <div class="prize-text">YOU WIN 1000 AED !</div>
-        </div>
-    </div>
+function createWheel() {
+    wheelDiv.innerHTML = '';
+    textContainer.innerHTML = '';
+    const numSegments = participants.length;
+    const anglePerSegment = 360 / numSegments;
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", "0 0 500 500");
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+    const wheelRadius = wheelDiv.offsetWidth / 2; // rayon réel de la roue
+    const textRadius = wheelRadius * 0.65; // distance idéale du centre
+
+    participants.forEach((name, i) => {
+        const startAngle = i * anglePerSegment;
+        const endAngle = startAngle + anglePerSegment;
+        const path = document.createElementNS(svgNS, "path");
+        const x1 = 250 + 250 * Math.cos(Math.PI * startAngle / 180), y1 = 250 + 250 * Math.sin(Math.PI * startAngle / 180);
+        const x2 = 250 + 250 * Math.cos(Math.PI * endAngle / 180), y2 = 250 + 250 * Math.sin(Math.PI * endAngle / 180);
+        path.setAttribute("d", `M250,250 L${x1},${y1} A250,250 0 0,1 ${x2},${y2} z`);
+        path.setAttribute("fill", segmentColors[i % segmentColors.length]);
+        svg.appendChild(path);
+        
+        // Angle centré pour le texte
+        const textAngle = startAngle + anglePerSegment / 2;
+        const textDiv = document.createElement('div');
+        textDiv.className = 'participant-text';
+        
+        const textSpan = document.createElement('span');
+        const truncatedName = name.length > 8 ? name.substring(0, 6) + '...' : name;
+        textSpan.innerText = truncatedName;
+        textDiv.appendChild(textSpan);
+        
+        // Calcul coordonnées
+        const textX = textRadius * Math.cos(textAngle * Math.PI / 180);
+        const textY = textRadius * Math.sin(textAngle * Math.PI / 180);
+        
+        // On garde le texte horizontal en annulant la rotation après positionnement
+        textDiv.style.left = `calc(50% + ${textX}px)`;
+        textDiv.style.top = `calc(50% + ${textY}px)`;
+        textDiv.style.transform = `translate(-50%, -50%) rotate(${textAngle}deg) rotate(${-textAngle}deg)`;
+        
+        textContainer.appendChild(textDiv);
+    });
     
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-      const firebaseConfig = {
-        apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
-        authDomain: "roue-de-la-chance-c0f6a.firebaseapp.com",
-        projectId: "roue-de-la-chance-c0f6a",
-        storageBucket: "roue-de-la-chance-c0f6a.appspot.com",
-        messagingSenderId: "491916732335",
-        appId: "1:491916732335:web:7a9765b2720d995583315a"
-      };
-      const app = initializeApp(firebaseConfig);
-      window.db = getFirestore(app);
-      window.firestoreFunctions = { collection, getDocs, doc, getDoc };
-    </script>
+    wheelDiv.appendChild(svg);
+}
 
-    <script>
-        let participants = [];
-        let predefinedWinners = [];
-        const segmentColors = ["#30b9aa", "#4ac2b7", "#64ccc4", "#7ed5d1"];
-        const spinDuration = 10;
-        const totalSpins = 6;
+// -------- SPIN : AJOUT OFFSET POUR ALIGNEMENT CURSEUR --------
+spinButton.addEventListener('click', () => {
+    if (isSpinning || currentWinnerIndex >= predefinedWinners.length) return;
 
-        const wheelDiv = document.getElementById('wheel');
-        const textContainer = document.getElementById('text-container');
-        const spinButton = document.getElementById('spin-button');
-        const confettiDiv1 = document.getElementById('confetti-animation-1'), confettiDiv2 = document.getElementById('confetti-animation-2'), confettiDiv3 = document.getElementById('confetti-animation-3'), confettiDiv4 = document.getElementById('confetti-animation-4');
-        const winnerPopup = document.getElementById('winner-popup');
-        const winnerNameDisplay = document.getElementById('winner-name-display');
+    const winnerName = predefinedWinners[currentWinnerIndex];
+    isSpinning = true; 
+    spinButton.disabled = true;
+    const winnerIndexOnWheel = participants.indexOf(winnerName);
 
-        const spinSound = new Howl({ src: ['song1.mp3'] });
-        const winSound = new Howl({ src: ['song2.mp3'] });
-        
-        const bgAnimation = lottie.loadAnimation({ container: document.getElementById('bg-animation'), renderer: 'svg', loop: true, autoplay: true, path: 'fond.json', rendererSettings: { preserveAspectRatio: 'xMidYMid slice' } });
-        const glowAnimation = lottie.loadAnimation({ container: document.getElementById('glow-animation'), renderer: 'canvas', loop: true, autoplay: true, path: 'lueur.json', rendererSettings: { assetsPath: 'images/' } });
-        const glowAnimation2 = lottie.loadAnimation({ container: document.getElementById('glow-animation-2'), renderer: 'canvas', loop: true, autoplay: true, path: 'lueur2.json', rendererSettings: { assetsPath: 'images/' } });
-        const confettiAnimation1 = lottie.loadAnimation({ container: confettiDiv1, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
-        const confettiAnimation2 = lottie.loadAnimation({ container: confettiDiv2, renderer: 'svg', loop: false, autoplay: false, path: 'confettis.json' });
-        const confettiAnimation3 = lottie.loadAnimation({ container: confettiDiv3, renderer: 'svg', loop: false, autoplay: false, path: 'confettis2.json' });
-        const confettiAnimation4 = lottie.loadAnimation({ container: confettiDiv4, renderer: 'svg', loop: false, autoplay: false, path: 'confettis2.json' });
-        confettiAnimation2.setDirection(-1); 
-        confettiAnimation4.setDirection(-1);
+    if (winnerIndexOnWheel === -1) {
+        alert(`Erreur : Gagnant "${winnerName}" non trouvé sur la roue.`);
+        isSpinning = false; 
+        spinButton.disabled = false; 
+        return;
+    }
 
-        async function setupGame() {
-            spinButton.textContent = "SPIN !";
-            const urlParams = new URLSearchParams(window.location.search);
-            const sessionId = urlParams.get('session');
-            
-            if (!sessionId) {
-                spinButton.textContent = "Erreur: Session ID";
-                return;
-            }
+    const anglePerSegment = 360 / participants.length;
+    let winnerAngle = (winnerIndexOnWheel * anglePerSegment) + (anglePerSegment / 2);
 
-            const { db, firestoreFunctions } = window;
-            const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
-            const participantsSnapshot = await firestoreFunctions.getDocs(participantsRef);
-            participants = participantsSnapshot.docs.map(doc => doc.data().pseudo);
+    // 🔥 Correction : Décalage pour que 0° corresponde au haut
+    winnerAngle += 90; 
 
-            const sessionDocRef = firestoreFunctions.doc(db, "sessions", sessionId);
-            const sessionDoc = await firestoreFunctions.getDoc(sessionDocRef);
-            if (sessionDoc.exists()) {
-                predefinedWinners = (sessionDoc.data().winners || []).filter(w => w !== null);
-            }
-            
-            if (participants.length > 0) {
-                createWheel();
-                if (predefinedWinners.length > 0) {
-                    spinButton.disabled = false;
-                } else {
-                    spinButton.textContent = "Pas de gagnants";
-                }
-            } else {
-                spinButton.textContent = "Pas de participants";
-            }
+    const targetRotation = -winnerAngle;
+    const currentRotation = gsap.getProperty(textContainer, "rotation") % 360;
+    const finalRotation = (360 * totalSpins) + targetRotation - currentRotation;
+    
+    spinSound.play();
+    gsap.to([wheelDiv, textContainer], {
+        rotation: `+=${finalRotation}`, 
+        duration: spinDuration, 
+        ease: "power4.out",
+        onComplete: () => {
+            spinSound.stop();
+            isSpinning = false; 
+            announceWinner(winnerName);
         }
-
-        function createWheel() {
-            wheelDiv.innerHTML = '';
-            textContainer.innerHTML = '';
-            const numSegments = participants.length;
-            const anglePerSegment = 360 / numSegments;
-            const svgNS = "http://www.w3.org/2000/svg";
-            const svg = document.createElementNS(svgNS, "svg");
-            svg.setAttribute("viewBox", "0 0 500 500");
-            
-            participants.forEach((name, i) => {
-                const startAngle = i * anglePerSegment;
-                const endAngle = startAngle + anglePerSegment;
-                const path = document.createElementNS(svgNS, "path");
-                const x1 = 250 + 250 * Math.cos(Math.PI * startAngle / 180), y1 = 250 + 250 * Math.sin(Math.PI * startAngle / 180);
-                const x2 = 250 + 250 * Math.cos(Math.PI * endAngle / 180), y2 = 250 + 250 * Math.sin(Math.PI * endAngle / 180);
-                path.setAttribute("d", `M250,250 L${x1},${y1} A250,250 0 0,1 ${x2},${y2} z`);
-                path.setAttribute("fill", segmentColors[i % segmentColors.length]);
-                svg.appendChild(path);
-                
-                // --- POSITIONNEMENT RADIAL PARFAITEMENT CONCENTRIQUE ---
-                const textAngle = startAngle + anglePerSegment / 2;
-                const textDiv = document.createElement('div');
-                textDiv.className = 'participant-text';
-                
-                const textSpan = document.createElement('span');
-                const truncatedName = name.length > 8 ? name.substring(0, 6) + '...' : name;
-                textSpan.innerText = truncatedName;
-                
-                textDiv.appendChild(textSpan);
-                
-                // DISTANCE FIXE ET IDENTIQUE pour tous les pseudos depuis le centre
-                const textRadius = 140; // Distance fixe du centre pour tous les textes
-                // Calcul des coordonnées en utilisant le centre comme référence absolue
-                const textX = textRadius * Math.cos(textAngle * Math.PI / 180);
-                const textY = textRadius * Math.sin(textAngle * Math.PI / 180);
-                
-                // Positionnement avec le centre comme origine
-                textDiv.style.left = `calc(50% + ${textX}px)`;
-                textDiv.style.top = `calc(50% + ${textY}px)`;
-                textDiv.style.transform = `translate(-50%, -50%) rotate(${textAngle}deg)`;
-                
-                textContainer.appendChild(textDiv);
-            });
-            
-            wheelDiv.appendChild(svg);
-        }
-        
-        let isSpinning = false, currentWinnerIndex = 0;
-        spinButton.addEventListener('click', () => {
-            if (isSpinning || currentWinnerIndex >= predefinedWinners.length) return;
-
-            const winnerName = predefinedWinners[currentWinnerIndex];
-            isSpinning = true; 
-            spinButton.disabled = true;
-            const winnerIndexOnWheel = participants.indexOf(winnerName);
-
-            if (winnerIndexOnWheel === -1) {
-                alert(`Erreur : Gagnant "${winnerName}" non trouvé sur la roue.`);
-                isSpinning = false; 
-                spinButton.disabled = false; 
-                return;
-            }
-
-            // --- CALCUL CORRIGÉ POUR ALIGNEMENT PARFAIT AVEC LE CURSEUR ---
-            const anglePerSegment = 360 / participants.length;
-            // Le curseur pointe vers le haut (0°), calcul de l'angle du segment gagnant
-            const winnerAngle = (winnerIndexOnWheel * anglePerSegment) + (anglePerSegment / 2);
-            // Alignement parfait avec le curseur qui pointe en haut (0°)
-            const targetRotation = -winnerAngle;
-
-            const currentRotation = gsap.getProperty(textContainer, "rotation") % 360;
-            const finalRotation = (360 * totalSpins) + targetRotation - currentRotation;
-            
-            spinSound.play();
-            gsap.to([wheelDiv, textContainer], {
-                rotation: `+=${finalRotation}`, 
-                duration: spinDuration, 
-                ease: "power4.out",
-                onComplete: () => {
-                    spinSound.stop();
-                    isSpinning = false; 
-                    announceWinner(winnerName);
-                }
-            });
-        });
-
-        function announceWinner(winnerName) {
-            winSound.play();
-            winnerNameDisplay.textContent = winnerName;
-            winnerPopup.style.display = 'flex';
-            confettiDiv1.style.display = 'block'; confettiAnimation1.goToAndPlay(0);
-            confettiDiv3.style.display = 'block'; confettiAnimation3.goToAndPlay(0);
-            setTimeout(() => { confettiDiv2.style.display = 'block'; confettiAnimation2.goToAndPlay(0); }, 300);
-            setTimeout(() => { confettiDiv4.style.display = 'block'; confettiAnimation4.goToAndPlay(0); }, 450);
-        }
-
-        winnerPopup.addEventListener('click', () => {
-            winnerPopup.style.display = 'none';
-            confettiDiv1.style.display = 'none'; confettiDiv2.style.display = 'none';
-            confettiDiv3.style.display = 'none'; confettiDiv4.style.display = 'none';
-            currentWinnerIndex++;
-            if (currentWinnerIndex < predefinedWinners.length) {
-                spinButton.disabled = false;
-            } else {
-                spinButton.textContent = "Jeu Terminé";
-                spinButton.disabled = true;
-            }
-        });
-
-        function checkFirebaseReady() {
-            if (window.db && window.firestoreFunctions) {
-                setupGame();
-            } else {
-                setTimeout(checkFirebaseReady, 50);
-            }
-        }
-        checkFirebaseReady();
-    </script>
-</body>
-</html>
+    });
+});
