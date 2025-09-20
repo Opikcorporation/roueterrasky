@@ -11,11 +11,13 @@
             background-color: #f5f5f7;
             color: #1d1d1f;
         }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 30px;
         }
+
         h1 {
             font-size: 32px;
             font-weight: 900;
@@ -23,6 +25,7 @@
             letter-spacing: 1px;
             margin: 0 0 40px 0;
         }
+
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -30,6 +33,7 @@
             gap: 30px;
             height: calc(100vh - 140px);
         }
+
         .card {
             background-color: #ffffff;
             border: 1px solid #d2d2d7;
@@ -37,27 +41,34 @@
             border-radius: 18px;
             padding: 30px;
         }
+
         .session-card {
             grid-column: 1 / -1;
         }
+        
         .participants-card {
             grid-column: 1 / 2;
             display: flex;
             flex-direction: column;
         }
+        
         .winners-card {
             grid-column: 2 / 3;
         }
+
         .card h2 {
             font-size: 22px;
             font-weight: 900;
             margin: 0 0 20px 0;
-            border-bottom: 1px solid #e8e8e8;
             padding-bottom: 15px;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+
         #create-session-btn {
-            width: 100%;
-            padding: 14px;
+            padding: 14px 28px;
             font-size: 17px;
             font-weight: 600;
             color: #ffffff;
@@ -67,43 +78,60 @@
             cursor: pointer;
             transition: background-color 0.2s ease-in-out;
         }
-        #create-session-btn:hover {
-            background-color: #333333;
-        }
+        #create-session-btn:hover { background-color: #333333; }
+
+        /* --- MISE EN PAGE DES LIENS CORRIGÉE --- */
         #session-links {
             margin-top: 20px;
-            display: none;
+            display: none; /* Caché par défaut, affiché via JS */
+            display: grid;
+            grid-template-columns: 1fr auto; /* Colonne flexible pour l'input, colonne fixe pour le bouton */
+            row-gap: 15px;
+            column-gap: 10px;
+            align-items: center;
         }
-        .link-group {
-            margin-bottom: 15px;
-        }
-        .link-group label {
-            display: block;
-            margin-bottom: 8px;
+        #session-links label {
+            grid-column: 1 / -1; /* Le label prend toute la largeur */
+            margin-bottom: -5px;
             font-weight: normal;
             color: #86868b;
             font-size: 14px;
         }
-        .link-group input {
-            width: calc(100% - 100px);
-            padding: 10px 12px;
+        #session-links input {
+            width: 100%;
+            padding: 12px;
             background-color: #f5f5f7;
             border: 1px solid #d2d2d7;
             border-radius: 8px;
             color: #1d1d1f;
             font-size: 14px;
             font-family: inherit;
+            box-sizing: border-box;
         }
-        .copy-btn {
-            width: 80px;
-            padding: 10px 12px;
-            margin-left: 10px;
+        #session-links button {
+            width: 90px;
+            padding: 12px;
             border: 1px solid #d2d2d7;
             background-color: #fff;
             border-radius: 8px;
             cursor: pointer;
+            font-weight: 600;
         }
-        .copy-btn:hover { background-color: #f5f5f7; }
+        #session-links button:hover { background-color: #f0f0f0; }
+
+        #download-btn {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #007aff;
+            background-color: #e5f2ff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        #download-btn:hover { background-color: #d8eaff; }
+
         #participant-list {
             list-style: none;
             padding: 0;
@@ -117,14 +145,13 @@
             cursor: pointer;
             transition: background-color 0.2s ease;
         }
-        #participant-list li:hover {
-            background-color: #f5f5f7;
-        }
+        #participant-list li:hover { background-color: #f5f5f7; }
         #participant-list li.selected {
             background-color: #007aff;
             color: white;
             font-weight: 600;
         }
+
         .winner-slot {
             background-color: #f5f5f7;
             border: 1px dashed #d2d2d7;
@@ -146,30 +173,36 @@
     </style>
 </head>
 <body>
+
     <div class="container">
         <h1>TABLEAU DE BORD ADMINISTRATEUR</h1>
+
         <div class="dashboard-grid">
             <div class="card session-card">
                 <h2>Session de Jeu</h2>
                 <button id="create-session-btn">Créer une nouvelle session</button>
+                <!-- STRUCTURE HTML CORRIGÉE -->
                 <div id="session-links">
-                    <div class="link-group">
-                        <label for="inscription-link">Lien d'inscription (à partager aux participants)</label>
-                        <input type="text" id="inscription-link" readonly>
-                        <button class="copy-btn" data-target="inscription-link">Copier</button>
-                    </div>
-                    <div class="link-group">
-                        <label for="wheel-link">Lien de la roue (à partager sur Zoom)</label>
-                        <input type="text" id="wheel-link" readonly>
-                        <button class="copy-btn" data-target="wheel-link">Copier</button>
-                    </div>
+                    <label for="inscription-link">Lien d'inscription</label>
+                    <input type="text" id="inscription-link" readonly>
+                    <button class="copy-btn" data-target="inscription-link">Copier</button>
+                    
+                    <label for="wheel-link">Lien de la roue</label>
+                    <input type="text" id="wheel-link" readonly>
+                    <button class="copy-btn" data-target="wheel-link">Copier</button>
                 </div>
             </div>
+
             <div class="card participants-card">
-                <h2>Participants Inscrits (<span id="participant-count">0</span>)</h2>
+                <h2>
+                    <span>Participants (<span id="participant-count">0</span>)</span>
+                    <button id="download-btn">Télécharger (CSV)</button>
+                </h2>
                 <ul id="participant-list">
+                    <!-- Les participants apparaîtront ici -->
                 </ul>
             </div>
+
             <div class="card winners-card">
                 <h2>Gagnants Sélectionnés</h2>
                 <div class="winner-slot" id="winner-slot-0"><span class="label">1er Gagnant :</span><span class="name"></span></div>
@@ -181,21 +214,25 @@
     </div>
 
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-      import { getFirestore, collection, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-      const firebaseConfig = {
-        apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
-        authDomain: "roue-de-la-chance-c0f6a.firebaseapp.com",
-        projectId: "roue-de-la-chance-c0f6a",
-        storageBucket: "roue-de-la-chance-c0f6a.appspot.com",
-        messagingSenderId: "491916732335",
-        appId: "1:491916732335:web:7a9765b2720d995583315a"
-      };
-      const app = initializeApp(firebaseConfig);
-      window.db = getFirestore(app);
-      window.firestoreFunctions = { collection, onSnapshot, doc, setDoc };
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
+            authDomain: "roue-de-la-chance-c0f6a.firebaseapp.com",
+            projectId: "roue-de-la-chance-c0f6a",
+            storageBucket: "roue-de-la-chance-c0f6a.appspot.com",
+            messagingSenderId: "491916732335",
+            appId: "1:491916732335:web:7a9765b2720d995583315a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.firestoreFunctions = { doc, setDoc, onSnapshot, collection };
     </script>
-    
+
     <script>
         const createSessionBtn = document.getElementById('create-session-btn');
         const sessionLinksDiv = document.getElementById('session-links');
@@ -205,47 +242,31 @@
         const participantCountSpan = document.getElementById('participant-count');
         const copyBtns = document.querySelectorAll('.copy-btn');
         const winnerSlotsUI = [
-            document.querySelector('#winner-slot-0 .name'), document.querySelector('#winner-slot-1 .name'),
-            document.querySelector('#winner-slot-2 .name'), document.querySelector('#winner-slot-3 .name')
+            document.querySelector('#winner-slot-0 .name'),
+            document.querySelector('#winner-slot-1 .name'),
+            document.querySelector('#winner-slot-2 .name'),
+            document.querySelector('#winner-slot-3 .name')
         ];
+        const downloadBtn = document.getElementById('download-btn');
         
         let participants = [];
         let winnerSlots = [null, null, null, null];
         let currentSessionId = null;
+        let unsubscribe = null; // Pour arrêter d'écouter les anciennes sessions
 
         createSessionBtn.addEventListener('click', () => {
             currentSessionId = `session-${Date.now().toString(36)}`;
-            const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
+            const baseUrl = 'https://opikorporation.github.io/touteterrasky/';
             
             inscriptionLinkInput.value = `${baseUrl}formulaire.html?session=${currentSessionId}`;
-            wheelLinkInput.value = `${baseUrl}index.html?session=${currentSessionId}`;
+            wheelLinkInput.value = `${baseUrl}?session=${currentSessionId}`;
             
-            sessionLinksDiv.style.display = 'block';
+            sessionLinksDiv.style.display = 'grid';
             createSessionBtn.disabled = true;
             createSessionBtn.textContent = 'Session Créée !';
+
             listenForParticipants(currentSessionId);
         });
-
-        function listenForParticipants(sessionId) {
-            const { db, firestoreFunctions } = window;
-            const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
-            firestoreFunctions.onSnapshot(participantsRef, (snapshot) => {
-                participantList.innerHTML = '';
-                participants = [];
-                snapshot.docs.forEach(doc => {
-                    const participantData = doc.data();
-                    participants.push(participantData);
-                    const li = document.createElement('li');
-                    li.textContent = participantData.pseudo;
-                    li.dataset.pseudo = participantData.pseudo;
-                    if (winnerSlots.includes(participantData.pseudo)) {
-                        li.classList.add('selected');
-                    }
-                    participantList.appendChild(li);
-                });
-                participantCountSpan.textContent = participants.length;
-            });
-        }
 
         copyBtns.forEach(btn => {
             btn.addEventListener('click', () => {
@@ -257,25 +278,53 @@
             });
         });
 
-        participantList.addEventListener('click', (event) => {
+        function listenForParticipants(sessionId) {
+            if (unsubscribe) unsubscribe(); // Arrête l'écoute précédente
+            
+            const { db, firestoreFunctions } = window;
+            const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
+
+            unsubscribe = firestoreFunctions.onSnapshot(participantsRef, (snapshot) => {
+                participants = [];
+                participantList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const participantData = doc.data();
+                    participants.push(participantData);
+                    
+                    const li = document.createElement('li');
+                    li.textContent = participantData.pseudo;
+                    li.dataset.pseudo = participantData.pseudo;
+                    participantList.appendChild(li);
+                });
+                participantCountSpan.textContent = participants.length;
+                updateSelectedState();
+            });
+        }
+        
+        participantList.addEventListener('click', async (event) => {
             if (event.target && event.target.tagName === 'LI') {
                 const selectedPseudo = event.target.dataset.pseudo;
                 const isAlreadyWinner = winnerSlots.includes(selectedPseudo);
+
                 if (isAlreadyWinner) {
                     const winnerIndex = winnerSlots.indexOf(selectedPseudo);
                     winnerSlots[winnerIndex] = null;
-                    event.target.classList.remove('selected');
                 } else {
                     const emptySlotIndex = winnerSlots.indexOf(null);
                     if (emptySlotIndex !== -1) {
                         winnerSlots[emptySlotIndex] = selectedPseudo;
-                        event.target.classList.add('selected');
                     } else {
                         alert("Toutes les places de gagnant sont déjà sélectionnées.");
+                        return;
                     }
                 }
                 updateWinnerSlotsUI();
-                saveWinnersToFirebase();
+                updateSelectedState();
+                
+                // Sauvegarder les gagnants dans Firestore
+                const { db, firestoreFunctions } = window;
+                const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+                await firestoreFunctions.setDoc(sessionDocRef, { winners: winnerSlots }, { merge: true });
             }
         });
         
@@ -293,17 +342,46 @@
             });
         }
 
-        async function saveWinnersToFirebase() {
-            if (!currentSessionId) return;
-            const { db, firestoreFunctions } = window;
-            const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
-            try {
-                await firestoreFunctions.setDoc(sessionDocRef, { winners: winnerSlots }, { merge: true });
-                console.log("Gagnants sauvegardés !");
-            } catch (error) {
-                console.error("Erreur de sauvegarde des gagnants :", error);
-            }
+        function updateSelectedState() {
+            const listItems = participantList.querySelectorAll('li');
+            listItems.forEach(li => {
+                if (winnerSlots.includes(li.dataset.pseudo)) {
+                    li.classList.add('selected');
+                } else {
+                    li.classList.remove('selected');
+                }
+            });
         }
+        
+        downloadBtn.addEventListener('click', () => {
+            if (participants.length === 0) {
+                alert("Il n'y a aucun participant à télécharger.");
+                return;
+            }
+            if (!currentSessionId) {
+                alert("Veuillez d'abord créer une session.");
+                return;
+            }
+
+            const headers = ['FullName', 'Pseudo', 'WhatsApp'];
+            const rows = participants.map(p => 
+                [p.fullname, p.pseudo, p.whatsapp].map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')
+            );
+            
+            let csvContent = headers.join(',') + '\r\n' + rows.join('\r\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `participants_${currentSessionId}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
     </script>
 </body>
 </html>
+
