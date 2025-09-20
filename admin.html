@@ -13,9 +13,9 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 30px;
+            padding: 20px;
         }
 
         h1 {
@@ -23,23 +23,24 @@
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin: 0 0 40px 0;
+            margin: 0 0 30px 0;
+            text-align: center;
         }
 
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: auto 1fr;
-            gap: 30px;
-            height: calc(100vh - 140px);
+            gap: 20px;
+            height: calc(100vh - 120px);
         }
 
         .card {
             background-color: #ffffff;
             border: 1px solid #d2d2d7;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
-            border-radius: 18px;
-            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            border-radius: 16px;
+            padding: 24px;
         }
 
         .session-card {
@@ -57,64 +58,112 @@
         }
 
         .card h2 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 900;
-            margin: 0 0 20px 0;
-            padding-bottom: 15px;
+            margin: 0 0 16px 0;
+            padding-bottom: 12px;
             border-bottom: 1px solid #e8e8e8;
         }
 
         #create-session-btn {
             width: 100%;
-            padding: 14px;
-            font-size: 17px;
+            padding: 12px 20px;
+            font-size: 16px;
             font-weight: 600;
             color: #ffffff;
             background-color: #000000;
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
+            transition: all 0.2s ease;
         }
         #create-session-btn:hover {
             background-color: #333333;
+            transform: translateY(-1px);
         }
 
         #session-links {
-            margin-top: 20px;
+            margin-top: 16px;
             display: none; 
         }
 
         .link-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
         .link-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: normal;
+            font-weight: 500;
             color: #86868b;
-            font-size: 14px;
+            font-size: 13px;
+        }
+        .link-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
         }
         .link-group input {
-            width: calc(100% - 100px);
+            flex: 1;
             padding: 10px 12px;
             background-color: #f5f5f7;
             border: 1px solid #d2d2d7;
             border-radius: 8px;
             color: #1d1d1f;
-            font-size: 14px;
+            font-size: 13px;
             font-family: inherit;
         }
         .copy-btn {
-            width: 80px;
-            padding: 10px 12px;
-            margin-left: 10px;
-            border: 1px solid #d2d2d7;
-            background-color: #fff;
+            padding: 10px 16px;
+            border: 1px solid #007aff;
+            background-color: #007aff;
+            color: white;
             border-radius: 8px;
             cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            min-width: 70px;
         }
-        .copy-btn:hover { background-color: #f5f5f7; }
+        .copy-btn:hover { 
+            background-color: #0056d6;
+            transform: translateY(-1px);
+        }
+
+        .participants-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .participants-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .download-btn {
+            padding: 8px 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+        }
+
+        .download-btn:disabled {
+            background-color: #d2d2d7;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         #participant-list {
             list-style: none;
@@ -122,12 +171,19 @@
             margin: 0;
             overflow-y: auto;
             flex-grow: 1;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            max-height: 400px;
         }
         #participant-list li {
-            padding: 15px;
+            padding: 12px 16px;
             border-bottom: 1px solid #e8e8e8;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        #participant-list li:last-child {
+            border-bottom: none;
         }
         #participant-list li:hover {
             background-color: #f5f5f7;
@@ -142,19 +198,105 @@
             background-color: #f5f5f7;
             border: 1px dashed #d2d2d7;
             border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            font-size: 18px;
+            padding: 16px;
+            margin-bottom: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
         }
         .winner-slot .label {
             color: #86868b;
-            font-size: 14px;
-            margin-right: 10px;
+            font-size: 13px;
+            margin-right: 8px;
+            font-weight: 500;
         }
         .winner-slot.filled {
             background-color: #e5f2ff;
             border-color: #007aff;
+            border-style: solid;
             font-weight: 600;
+        }
+
+        .import-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e8e8e8;
+        }
+
+        .import-btn {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #007aff;
+            background-color: #f0f8ff;
+            border: 1px solid #007aff;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .import-btn:hover {
+            background-color: #e5f2ff;
+            transform: translateY(-1px);
+        }
+
+        #participant-import {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            resize: vertical;
+            display: none;
+            box-sizing: border-box;
+        }
+
+        .import-actions {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .import-actions button {
+            padding: 10px 12px;
+            border: 1px solid #d2d2d7;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .import-confirm {
+            background-color: #007aff;
+            color: white;
+            border-color: #007aff;
+        }
+
+        .import-confirm:hover {
+            background-color: #0056d6;
+        }
+
+        .import-cancel {
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .import-cancel:hover {
+            background-color: #e8e8e8;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 11px;
+            color: #86868b;
+            padding: 16px 0;
+            border-top: 1px solid #e8e8e8;
         }
         
     </style>
@@ -171,22 +313,40 @@
                 <div id="session-links">
                     <div class="link-group">
                         <label for="inscription-link">Lien d'inscription (à partager aux participants)</label>
-                        <input type="text" id="inscription-link" readonly>
-                        <button class="copy-btn" data-target="inscription-link">Copier</button>
+                        <div class="link-input-row">
+                            <input type="text" id="inscription-link" readonly>
+                            <button class="copy-btn" data-target="inscription-link">Copier</button>
+                        </div>
                     </div>
                     <div class="link-group">
                         <label for="wheel-link">Lien de la roue (à partager sur Zoom)</label>
-                        <input type="text" id="wheel-link" readonly>
-                        <button class="copy-btn" data-target="wheel-link">Copier</button>
+                        <div class="link-input-row">
+                            <input type="text" id="wheel-link" readonly>
+                            <button class="copy-btn" data-target="wheel-link">Copier</button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="card participants-card">
-                <h2>Participants Inscrits (<span id="participant-count">0</span>)</h2>
+                <div class="participants-header">
+                    <h2>Participants Inscrits (<span id="participant-count">0</span>)</h2>
+                    <div class="participants-actions">
+                        <button class="download-btn" id="download-btn" disabled>Télécharger CSV</button>
+                    </div>
+                </div>
                 <ul id="participant-list">
                     <!-- Les participants apparaîtront ici -->
                 </ul>
+                
+                <div class="import-section">
+                    <button class="import-btn" id="import-btn">Importer une liste de participants</button>
+                    <textarea id="participant-import" placeholder="Entrez un nom par ligne :&#10;Nom 1&#10;Nom 2&#10;Nom 3&#10;..."></textarea>
+                    <div class="import-actions">
+                        <button class="import-confirm" id="import-confirm">Confirmer</button>
+                        <button class="import-cancel" id="import-cancel">Annuler</button>
+                    </div>
+                </div>
             </div>
 
             <div class="card winners-card">
@@ -199,9 +359,13 @@
         </div>
     </div>
 
+    <div class="footer">
+        Designed and Developed by Osmaweb, a subsidiary of Opik Corporation – Alessio Opik
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD_HpLVSSbWJcsvEJVydcpQXy-83YqFZL8",
@@ -216,7 +380,7 @@
         const db = getFirestore(app);
 
         window.db = db;
-        window.firestoreFunctions = { doc, setDoc, onSnapshot, collection };
+        window.firestoreFunctions = { doc, setDoc, onSnapshot, collection, addDoc };
     </script>
 
     <script>
@@ -227,6 +391,12 @@
         const participantList = document.getElementById('participant-list');
         const participantCountSpan = document.getElementById('participant-count');
         const copyBtns = document.querySelectorAll('.copy-btn');
+        const importBtn = document.getElementById('import-btn');
+        const participantImport = document.getElementById('participant-import');
+        const importActions = document.querySelector('.import-actions');
+        const importConfirm = document.getElementById('import-confirm');
+        const importCancel = document.getElementById('import-cancel');
+        const downloadBtn = document.getElementById('download-btn');
         const winnerSlotsUI = [
             document.querySelector('#winner-slot-0 .name'),
             document.querySelector('#winner-slot-1 .name'),
@@ -238,8 +408,9 @@
         let winnerSlots = [null, null, null, null];
         let currentSessionId = null;
         let unsubscribe = null;
+        let randomMode = false;
 
-        createSessionBtn.addEventListener('click', () => {
+        createSessionBtn.addEventListener('click', async () => {
             currentSessionId = `session-${Date.now().toString(36)}`;
             const baseUrl = 'https://opikcorporation.github.io/roueterrasky/';
             
@@ -250,7 +421,73 @@
             createSessionBtn.disabled = true;
             createSessionBtn.textContent = 'Session Créée !';
 
+            // Initialiser la session en mode aléatoire par défaut
+            randomMode = true;
+            const { db, firestoreFunctions } = window;
+            const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+            await firestoreFunctions.setDoc(sessionDocRef, { 
+                winners: [], 
+                randomMode: true 
+            });
+
             listenForParticipants(currentSessionId);
+        });
+
+        // Gestion de l'import de participants
+        importBtn.addEventListener('click', () => {
+            participantImport.style.display = 'block';
+            importActions.style.display = 'flex';
+            importBtn.style.display = 'none';
+        });
+
+        importCancel.addEventListener('click', () => {
+            participantImport.style.display = 'none';
+            importActions.style.display = 'none';
+            importBtn.style.display = 'block';
+            participantImport.value = '';
+        });
+
+        importConfirm.addEventListener('click', async () => {
+            if (!currentSessionId) {
+                alert('Veuillez d\'abord créer une session.');
+                return;
+            }
+
+            const names = participantImport.value
+                .split('\n')
+                .map(name => name.trim())
+                .filter(name => name.length > 0);
+
+            if (names.length === 0) {
+                alert('Veuillez entrer au moins un nom.');
+                return;
+            }
+
+            const { db, firestoreFunctions } = window;
+            const participantsRef = firestoreFunctions.collection(db, "sessions", currentSessionId, "participants");
+
+            try {
+                for (const name of names) {
+                    await firestoreFunctions.addDoc(participantsRef, {
+                        fullname: name,
+                        pseudo: name,
+                        pseudo_lowercase: name.toLowerCase(),
+                        whatsapp: 'N/A',
+                        timestamp: new Date(),
+                        imported: true
+                    });
+                }
+
+                participantImport.style.display = 'none';
+                importActions.style.display = 'none';
+                importBtn.style.display = 'block';
+                participantImport.value = '';
+                
+                alert(`${names.length} participants importés avec succès !`);
+            } catch (error) {
+                console.error('Erreur lors de l\'import:', error);
+                alert('Erreur lors de l\'import des participants.');
+            }
         });
 
         copyBtns.forEach(btn => {
@@ -261,6 +498,40 @@
                 btn.textContent = 'Copié !';
                 setTimeout(() => { btn.textContent = 'Copier'; }, 2000);
             });
+        });
+
+        // Bouton de téléchargement CSV
+        downloadBtn.addEventListener('click', () => {
+            if (participants.length === 0) {
+                alert('Aucun participant à télécharger.');
+                return;
+            }
+
+            // Créer le contenu CSV
+            let csvContent = "Nom Complet,Pseudo,Numéro WhatsApp,Date d'inscription,Type\n";
+            
+            participants.forEach(participant => {
+                const fullname = participant.fullname || 'N/A';
+                const pseudo = participant.pseudo || 'N/A';
+                const whatsapp = participant.whatsapp || 'N/A';
+                const date = participant.timestamp ? new Date(participant.timestamp.seconds * 1000).toLocaleDateString('fr-FR') : 'N/A';
+                const type = participant.imported ? 'Importé' : 'Formulaire';
+                
+                csvContent += `"${fullname}","${pseudo}","${whatsapp}","${date}","${type}"\n`;
+            });
+
+            // Créer et télécharger le fichier
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `participants_${currentSessionId}_${new Date().toLocaleDateString('fr-FR').replace(/\//g, '-')}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
 
         function listenForParticipants(sessionId) {
@@ -282,6 +553,10 @@
                     participantList.appendChild(li);
                 });
                 participantCountSpan.textContent = participants.length;
+                
+                // Activer le bouton de téléchargement si il y a des participants
+                downloadBtn.disabled = participants.length === 0;
+                
                 updateSelectedState();
             });
         }
@@ -303,12 +578,20 @@
                         return;
                     }
                 }
+
+                // Vérifier si on a des gagnants prédéfinis
+                const hasWinners = winnerSlots.some(winner => winner !== null);
+                randomMode = !hasWinners;
+
                 updateWinnerSlotsUI();
                 updateSelectedState();
                 
                 const { db, firestoreFunctions } = window;
                 const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
-                await firestoreFunctions.setDoc(sessionDocRef, { winners: winnerSlots }, { merge: true });
+                await firestoreFunctions.setDoc(sessionDocRef, { 
+                    winners: winnerSlots, 
+                    randomMode: randomMode 
+                }, { merge: true });
             }
         });
         
