@@ -272,6 +272,10 @@
             winnerPopup.style.display = 'none';
             confettiDiv1.style.display = 'none'; confettiDiv2.style.display = 'none';
             confettiDiv3.style.display = 'none'; confettiDiv4.style.display = 'none';
+            
+            // Remise à zéro de la rotation de la roue pour le prochain spin
+            gsap.set(wheelDiv, { rotation: 0 });
+            
             currentWinnerIndex++;
             if (currentWinnerIndex < predefinedWinners.length) {
                 spinButton.disabled = false;
