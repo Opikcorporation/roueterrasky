@@ -474,6 +474,159 @@
         let unsubscribe = null;
         let randomMode = false;
 
+        // DÉFINIR TOUTES LES FONCTIONS EN PREMIER
+        
+        // Fonction pour gérer la sélection des gagnants
+        async function toggleWinner(pseudo, buttonElement) {
+            const isAlreadyWinner = winnerSlots.includes(pseudo);
+
+            if (isAlreadyWinner) {
+                const winnerIndex = winnerSlots.indexOf(pseudo);
+                winnerSlots[winnerIndex] = null;
+                buttonElement.classList.remove('active');
+            } else {
+                const emptySlotIndex = winnerSlots.indexOf(null);
+                if (emptySlotIndex !== -1) {
+                    winnerSlots[emptySlotIndex] = pseudo;
+                    buttonElement.classList.add('active');
+                } else {
+                    alert("Toutes les places de gagnant sont déjà sélectionnées.");
+                    return;
+                }
+            }
+
+            // Vérifier si on a des gagnants prédéfinis
+            const hasWinners = winnerSlots.some(winner => winner !== null);
+            randomMode = !hasWinners;
+
+            updateWinnerSlotsUI();
+            
+            const { db, firestoreFunctions } = window;
+            const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+            await firestoreFunctions.setDoc(sessionDocRef, { 
+                winners: winnerSlots, 
+                randomMode: randomMode 
+            }, { merge: true });
+        }
+
+        // Fonction pour supprimer un participant
+        async function deleteParticipant(participantId, pseudo) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer le participant "${pseudo}" ?`)) {
+                return;
+            }
+
+            try {
+                const { db, firestoreFunctions } = window;
+                const participantDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId, "participants", participantId);
+                await firestoreFunctions.deleteDoc(participantDocRef);
+
+                // Supprimer le participant des gagnants s'il y est
+                const wasWinner = winnerSlots.includes(pseudo);
+                if (wasWinner) {
+                    const winnerIndex = winnerSlots.indexOf(pseudo);
+                    winnerSlots[winnerIndex] = null;
+                    updateWinnerSlotsUI();
+                    
+                    // Mettre à jour Firebase
+                    const sessionDocRef = firestoreFunctions.doc(db, "sessions", currentSessionId);
+                    await firestoreFunctions.setDoc(sessionDocRef, { 
+                        winners: winnerSlots, 
+                        randomMode: !winnerSlots.some(winner => winner !== null)
+                    }, { merge: true });
+                }
+            } catch (error) {
+                console.error('Erreur lors de la suppression:', error);
+                alert('Erreur lors de la suppression du participant.');
+            }
+        }
+
+        function updateWinnerSlotsUI() {
+            winnerSlots.forEach((pseudo, index) => {
+                const slotElement = document.getElementById(`winner-slot-${index}`);
+                const nameElement = winnerSlotsUI[index];
+                if (pseudo) {
+                    nameElement.textContent = pseudo;
+                    slotElement.classList.add('filled');
+                } else {
+                    nameElement.textContent = '';
+                    slotElement.classList.remove('filled');
+                }
+            });
+        }
+
+        function updateSelectedState() {
+            const listItems = participantList.querySelectorAll('li');
+            listItems.forEach(li => {
+                const pseudo = li.dataset.pseudo;
+                const winnerBtn = li.querySelector('.winner-btn');
+                if (winnerBtn && winnerSlots.includes(pseudo)) {
+                    winnerBtn.classList.add('active');
+                } else if (winnerBtn) {
+                    winnerBtn.classList.remove('active');
+                }
+            });
+        }
+
+        function listenForParticipants(sessionId) {
+            if (unsubscribe) unsubscribe();
+            
+            const { db, firestoreFunctions } = window;
+            const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
+
+        function listenForParticipants(sessionId) {
+            if (unsubscribe) unsubscribe();
+            
+            const { db, firestoreFunctions } = window;
+            const participantsRef = firestoreFunctions.collection(db, "sessions", sessionId, "participants");
+
+            unsubscribe = firestoreFunctions.onSnapshot(participantsRef, (snapshot) => {
+                participants = [];
+                participantList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const participantData = doc.data();
+                    participantData.id = doc.id; // Stocker l'ID du document
+                    participants.push(participantData);
+                    
+                    const li = document.createElement('li');
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'participant-name';
+                    nameSpan.textContent = participantData.pseudo;
+                    
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'participant-actions';
+                    
+                    // Bouton gagnant (coupe)
+                    const winnerBtn = document.createElement('button');
+                    winnerBtn.className = 'winner-btn';
+                    winnerBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="#666"><path d="M5 16L3 14v-3c0-1.1.9-2 2-2h1V7a1 1 0 011-1h10a1 1 0 011 1v2h1c1.1 0 2 .9 2 2v3l-2 2v5H5v-5zm2 0h10v3H7v-3zm10-2V11H7v3h10zm-1-5V8H8v1h8z"/></svg>';
+                    winnerBtn.addEventListener('click', () => toggleWinner(participantData.pseudo, winnerBtn));
+                    
+                    // Bouton supprimer (croix)
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.innerHTML = '✕';
+                    deleteBtn.addEventListener('click', () => deleteParticipant(doc.id, participantData.pseudo));
+                    
+                    actionsDiv.appendChild(winnerBtn);
+                    actionsDiv.appendChild(deleteBtn);
+                    
+                    li.appendChild(nameSpan);
+                    li.appendChild(actionsDiv);
+                    li.dataset.pseudo = participantData.pseudo;
+                    participantList.appendChild(li);
+                });
+                participantCountSpan.textContent = participants.length;
+                
+                // Activer le bouton de téléchargement si il y a des participants
+                downloadBtn.disabled = participants.length === 0;
+                
+                updateSelectedState();
+            });
+        }
+
+        // MAINTENANT LES EVENT LISTENERS
+        }
+
         createSessionBtn.addEventListener('click', async () => {
             currentSessionId = `session-${Date.now().toString(36)}`;
             const baseUrl = 'https://opikcorporation.github.io/roueterrasky/';
