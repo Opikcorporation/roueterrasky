@@ -15,7 +15,7 @@
         .ticker{position:absolute;top:-15px;left:50%;transform:translateX(-50%);width:60px;height:70px;background-image:url(curseur.png);background-size:contain;background-repeat:no-repeat;z-index:10;filter:drop-shadow(0 4px 3px rgba(0,0,0,.5))}
         .wheel svg{width:100%;height:100%}
         #text-container{position:absolute;width:100%;height:100%;pointer-events:none;z-index:4;border-radius:50%}
-        .participant-text{position:absolute;top:50%;left:50%;transform-origin:0 50%;font-size:clamp(8px,2vw,14px);font-weight:700;color:#fff;text-align:center;white-space:nowrap;pointer-events:none}
+        .participant-text{position:absolute;top:50%;left:50%;transform-origin:0 50%;font-size:clamp(7px,1.8vw,12px);font-weight:700;color:#fff;text-align:center;white-space:nowrap;pointer-events:none}
         .participant-text span{display:inline-block}
         #spin-button{padding:15px 40px;font-size:24px;font-weight:700;color:#fff;background:linear-gradient(45deg,#30b9aa,#2c837a);border:8px solid #000;border-radius:50px;cursor:pointer;text-transform:uppercase;box-shadow:0 5px 15px rgba(0,0,0,.3);transition:all .2s ease-in-out;z-index:10;flex-shrink:0}#spin-button:hover{transform:scale(1.05);box-shadow:0 8px 25px rgba(48,185,170,.4)}#spin-button:disabled{cursor:not-allowed;background:#ccc;transform:scale(1);box-shadow:none;color:#888; border-color: #999;}.winner-popup{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.8);z-index:200;display:none;justify-content:center;align-items:center;cursor:pointer}.winner-popup .winner-content{position:relative;z-index:201;text-align:center}
         .winner-popup .winner-name{font-size:clamp(40px,12vw,80px);font-weight:800;padding:0 20px;color:#30b9aa;text-shadow:0 1px 0 #2a7e75,0 2px 0 #28766d,0 3px 0 #266d65,0 4px 0 #24655e,0 5px 0 #225c56,0 6px 1px rgba(0,0,0,.1),0 0 5px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.3),0 3px 5px rgba(0,0,0,.2),0 5px 10px rgba(0,0,0,.25),0 10px 10px rgba(0,0,0,.2),0 20px 20px rgba(0,0,0,.15)}
@@ -152,23 +152,23 @@
                 path.setAttribute("fill", segmentColors[i % segmentColors.length]);
                 svg.appendChild(path);
                 
-                // --- POSITIONNEMENT RADIAL DU TEXTE ---
+                // --- POSITIONNEMENT RADIAL DU TEXTE CORRIGÉ ---
                 const textAngle = startAngle + anglePerSegment / 2;
                 const textDiv = document.createElement('div');
                 textDiv.className = 'participant-text';
                 
                 const textSpan = document.createElement('span');
-                const truncatedName = name.length > 10 ? name.substring(0, 8) + '...' : name;
+                const truncatedName = name.length > 8 ? name.substring(0, 6) + '...' : name;
                 textSpan.innerText = truncatedName;
                 
                 textDiv.appendChild(textSpan);
                 
-                // Position du texte au milieu du segment, orientation radiale
-                const textRadius = 120; // Distance du centre
+                // Position du texte plus proche du centre pour éviter les dépassements
+                const textRadius = 100; // Réduit pour rester dans la roue
                 const textX = textRadius * Math.cos((textAngle - 90) * Math.PI / 180);
                 const textY = textRadius * Math.sin((textAngle - 90) * Math.PI / 180);
                 
-                // Positionnement avec rotation radiale (du centre vers l'extérieur)
+                // Positionnement avec rotation radiale parfaitement centrée
                 textDiv.style.left = `calc(50% + ${textX}px)`;
                 textDiv.style.top = `calc(50% + ${textY}px)`;
                 textDiv.style.transform = `translate(-50%, -50%) rotate(${textAngle - 90}deg)`;
@@ -195,13 +195,12 @@
                 return;
             }
 
-            // --- CALCUL CORRIGÉ POUR ALIGNEMENT AVEC LE CURSEUR ---
+            // --- CALCUL CORRIGÉ POUR ALIGNEMENT PARFAIT AVEC LE CURSEUR ---
             const anglePerSegment = 360 / participants.length;
-            // Le curseur pointe vers le haut (0°), on calcule l'angle du centre du segment gagnant
+            // Le curseur pointe vers le haut (0°), calcul de l'angle du segment gagnant
             const winnerAngle = (winnerIndexOnWheel * anglePerSegment) + (anglePerSegment / 2);
-            // On veut que le centre du segment soit aligné avec le curseur (en haut)
-            // Le curseur pointe à 0° (12h), donc on calcule la rotation nécessaire
-            const targetRotation = 360 - winnerAngle + 90; // +90 pour compensation du curseur en haut
+            // Alignement parfait avec le curseur qui pointe en haut (0°)
+            const targetRotation = -winnerAngle;
 
             const currentRotation = gsap.getProperty(textContainer, "rotation") % 360;
             const finalRotation = (360 * totalSpins) + targetRotation - currentRotation;
