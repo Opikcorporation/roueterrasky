@@ -152,7 +152,7 @@
                 path.setAttribute("fill", segmentColors[i % segmentColors.length]);
                 svg.appendChild(path);
                 
-                // --- POSITIONNEMENT RADIAL DU TEXTE PARFAITEMENT CENTRÉ ---
+                // --- POSITIONNEMENT RADIAL PARFAITEMENT CONCENTRIQUE ---
                 const textAngle = startAngle + anglePerSegment / 2;
                 const textDiv = document.createElement('div');
                 textDiv.className = 'participant-text';
@@ -163,16 +163,16 @@
                 
                 textDiv.appendChild(textSpan);
                 
-                // Position du texte au milieu parfait du segment (entre le centre et le bord)
-                // Roue de rayon ~250px (viewBox 500x500), centre du segment à mi-chemin
-                const textRadius = 125; // Exactement au milieu entre centre (0) et bord (250)
-                const textX = textRadius * Math.cos((textAngle - 90) * Math.PI / 180);
-                const textY = textRadius * Math.sin((textAngle - 90) * Math.PI / 180);
+                // DISTANCE FIXE ET IDENTIQUE pour tous les pseudos depuis le centre
+                const textRadius = 140; // Distance fixe du centre pour tous les textes
+                // Calcul des coordonnées en utilisant le centre comme référence absolue
+                const textX = textRadius * Math.cos(textAngle * Math.PI / 180);
+                const textY = textRadius * Math.sin(textAngle * Math.PI / 180);
                 
-                // Positionnement avec rotation radiale parfaitement centrée
+                // Positionnement avec le centre comme origine
                 textDiv.style.left = `calc(50% + ${textX}px)`;
                 textDiv.style.top = `calc(50% + ${textY}px)`;
-                textDiv.style.transform = `translate(-50%, -50%) rotate(${textAngle - 90}deg)`;
+                textDiv.style.transform = `translate(-50%, -50%) rotate(${textAngle}deg)`;
                 
                 textContainer.appendChild(textDiv);
             });
